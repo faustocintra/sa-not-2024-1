@@ -18,5 +18,5 @@ model User {
   fullname    String
   username    String      @unique
   password    String
-  id_admin    Boolean     @default(false)
+  is_admin    Boolean     @default(false)
 }
