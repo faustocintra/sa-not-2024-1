@@ -119,7 +119,7 @@ controller.login = async function(req, res) {
         //  HTTP 401: Unauthorized
         if(! user) return res.send(401).end
 
-        // suário encontrado, vamos conferir a senha
+        // Usuário encontrado, vamos conferir a senha
         const passwordMatches = await bcrypt.compare(req.body.password, user.password)
 
         // Se a senha estiver incorreta ~>
