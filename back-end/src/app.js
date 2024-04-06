@@ -6,6 +6,8 @@ import logger from "morgan";
 import indexRouter from "./routes/index.js";
 import userRouter from "./routes/user.js";
 
+import auth from "./middleware/auth.js";
+
 const app = express();
 dotenv.config()
 
@@ -14,7 +16,10 @@ app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.use(auth);
+
 app.use("/", indexRouter);
 app.use("/users", userRouter);
+
 
 export default app;
