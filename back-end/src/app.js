@@ -1,4 +1,4 @@
-//Importa as Variaveis do ambiente do arquivo env
+// Importa as variáveis de ambiente do arquivo .env
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -19,12 +19,15 @@ app.use(cookieParser());
 app.use("/", indexRouter);
 //app.use("/users", usersRouter);
 
-/***********************
- * Routas
- * *********************
- */
+// MIDDLEWARE DE AUTENTICAÇÃO
+import auth from './middleware/auth.js'
+app.use(auth)
+
+/**************************************************
+ * ROTAS
+ **************************************************/
+
 import userRouter from './routes/user.js'
 app.use('/users', userRouter)
-
 
 export default app;
