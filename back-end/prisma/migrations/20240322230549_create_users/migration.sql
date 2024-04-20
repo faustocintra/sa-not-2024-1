@@ -4,7 +4,7 @@ CREATE TABLE "User" (
     "fullname" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "id_admin" BOOLEAN NOT NULL DEFAULT false
+    "is_admin" BOOLEAN NOT NULL DEFAULT false
 );
 
 -- CreateIndex

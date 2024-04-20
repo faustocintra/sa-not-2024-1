@@ -1,4 +1,3 @@
-
 import React from 'react'
 import { Link } from 'react-router-dom'
 
@@ -13,6 +12,9 @@ export default function AppHeader() {
         </li>
         <li style={{ marginRight: '12px' }}>
           <Link to="/login">Entrar</Link>
+        </li>
+        <li style={{ marginRight: '12px' }}>
+          <Link to="/users">Usuários</Link>
         </li>
       </ol>
     </>

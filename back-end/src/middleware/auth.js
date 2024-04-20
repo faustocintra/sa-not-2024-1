@@ -1,33 +1,68 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken'
 
-export default function(req, res, next){
+export default function(req, res, next) {
 
-    const bypassRoutes = [
-        {url: '/users/login', method: 'POST'},
-        { url: '/users', method: 'POST' }
-    ]
+  /*
+    Algumas rotas, como /users/login, devem poder ser acessadas
+    sem a necessidade de fornecimento de um token. Tais rotas
+    são cadastradas no vetor bypassRoutes.
+  */
+  const bypassRoutes = [
+    { url: '/users/login', method: 'POST' },
+    { url: '/users', method: 'POST' }
+  ]
 
-    for(let route of bypassRoutes){
-        if(route.url === req.url && route.method === req.method){
-            next()
-            return
-        }
+  /*
+    Verifica se a rota atual está cadastrada em bypassRoutes. Caso
+    esteja, passa para o próximo middleware (next()) sem verificar
+    o token.
+  */
+  for(let route of bypassRoutes) {
+    if(route.url === req.url && route.method === req.method) {
+      next()
+      return
     }
+  }
 
-    const authHeader = req.headers['authorization']
+  /*
+    Para todas as demais rotas, é necessário que o token tenha sido
+    enviado no cabeçalho (header) 'authorization'.
+  */
+  const authHeader = req.headers['authorization']
 
-    if(!authHeader) return res.status(403).end()
+  /*
+    Se o cabeçalho 'authorization' não existir na requisição, retornamos
+    HTTP 403: Forbidden
+  */
+  if(! authHeader) return res.status(403).end()
 
-    const[ , token] = authHeader.split(' ')
+  /*
+    O cabeçalho 'authorization' é enviado como uma string no formato
+    "Bearer: XXXXX", onde "XXXXX" é o token. Portanto, para extrair o
+    token, precisamos recortar a string no ponto onde há um espaço em
+    branco e pegar somente a segunda parte
+  */
+  const [ , token] = authHeader.split(' ')
 
-    jwt.verify(token, process.env.KEY_TOKEN, (error, user) => {
+  // VERIFICAÇÃO E VALIDAÇÃO DO TOKEN
+  jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
 
-        if(error) return res.status(403).end()
+    /* 
+      Se há erro, significa que o token é inválido ou está expirado
+      HTTP 403: Forbidden
+    */
+    if(error) return res.status(403).end()
 
-        req.authUser =  user
+    /*
+      Se chegamos até aqui, o token está OK e temos as informações
+      do usuário autenticado no parâmetro 'user'. Vamos guardá-lo
+      dentro do 'req' para futura utilização
+    */
+    req.authUser = user
 
-        next()
+    // Continuamos para o próximo middleware
+    next()
 
-    })
+  })
 
 }
