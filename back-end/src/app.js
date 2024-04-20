@@ -17,7 +17,8 @@ app.use(cors({
   origin: process.env.FRONT_END_SERVER.split(','),
   credentials: true   // Aceita cookies na requisição 
 }))
-console.log("ORIGEM: " + process.env.FRONT_END_SERVER)
+
+//console.log("ORIGEM: " + process.env.FRONT_END_SERVER)
 
 app.use(logger("dev"));
 app.use(json());
