@@ -130,7 +130,7 @@ controller.login = async function(req, res) {
 
   //Executando a consulta com parametro para previnir SQL Injection
   const query = `select * from user where username =  ?;`
-  console.log({query})
+  // console.log({query})
 
 
   try {
