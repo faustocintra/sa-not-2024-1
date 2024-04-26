@@ -25,5 +25,5 @@ yarn-error.log*
 # dotenv
 .env
 
-# database 
+# database
 local.db*
