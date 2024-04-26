@@ -128,7 +128,7 @@ controller.login = async function(req, res) {
       driver: sqlite3.Database
     })
 
-    const user = await db.get(query)
+    const user = await db.get(query, [req.body.username])
 
     // Se o usuário não for encontrado ~>
     // HTTP 401: Unauthorized
