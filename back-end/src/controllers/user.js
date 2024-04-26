@@ -119,7 +119,11 @@ controller.delete = async function(req, res) {
 }
 
 controller.login = async function(req, res) {
-  const query = `select * from user where username = '${req.body.username}';`
+  // a consulta abaixo facilita um ataque
+  //const query = `select * from user where username = '${req.body.username}';`
+
+  const query = `select * from user where username = ?;`
+
   console.log({query})
 
   try {
@@ -127,8 +131,14 @@ controller.login = async function(req, res) {
       filename: dbPath,
       driver: sqlite3.Database
     })
+    
+    // SQL Injection
+    //const user = await db.get(query)
 
-    const user = await db.get(query)
+
+    //Previnir SQL Injection
+    const user = await db.get(query, [req.body.username])
+
 
     // Se o usuário não for encontrado ~>
     // HTTP 401: Unauthorized
