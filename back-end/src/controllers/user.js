@@ -120,6 +120,8 @@ controller.delete = async function(req, res) {
 
 controller.login = async function(req, res) {
   const query = `select * from user where username = '${req.body.username}';`
+  // const query = `select * from user where username = ?;`
+
   console.log({query})
 
   try {
@@ -129,6 +131,8 @@ controller.login = async function(req, res) {
     })
 
     const user = await db.get(query)
+    // const user = await db.get(query, [req.body.username])
+    console.log(user)
 
     // Se o usuário não for encontrado ~>
     // HTTP 401: Unauthorized
