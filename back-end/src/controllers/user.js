@@ -72,6 +72,7 @@ controller.update = async function (req, res) {
       //HTTP 403: Forbidden
       res.status(403).end();
     }
+    
     // Se tiver sido passado o campo 'password' no body
     // da requisição, precisamos criptografá-lo antes de
     // enviar ao banco de dados
