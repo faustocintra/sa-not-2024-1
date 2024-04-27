@@ -2,6 +2,18 @@ import prisma from '../database/client.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
+import sqlite3 from 'sqlite3'
+import { open } from 'sqlite'
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const basePath = __dirname.replaceAll('\\', '/').replace('/src/controllers', '')
+const dbPath = basePath + '/prisma/database/local.db'
+
 const controller = {}   // Objeto vazio
 
 controller.create = async function(req, res) {
@@ -107,22 +119,34 @@ controller.delete = async function(req, res) {
 }
 
 controller.login = async function(req, res) {
+  const query = `select * from user where username = '${req.body.username}';`
+  console.log({query})
+
   try {
-    // Busca o usuário pelo username
-    const user = await prisma.user.findUnique({
-      where: { username: req.body.username.toLowerCase() }
+    const db = await open({
+      filename: dbPath,
+      driver: sqlite3.Database
     })
+
+    const user = await db.get(query)
+    console.log(user);
 
     // Se o usuário não for encontrado ~>
     // HTTP 401: Unauthorized
-    if(! user) return res.status(401).end()
+    if(! user) {
+      console.error('ERRO: usuário não encontrado.')
+      return res.status(401).end()
+    }
 
     // Usuário encontrado, vamos conferir a senha
     const passwordMatches = await bcrypt.compare(req.body.password, user.password)
 
     // Se a senha estiver incorreta ~>
     // HTTP 401: Unauthorized
-    if(! passwordMatches) return res.status(401).end()
+    if(! passwordMatches) {
+      console.error('ERRO: senha inválida.')
+      return res.status(401).end()
+    }
 
     // Se chegamos até aqui, username + password estão OK
     // Vamos criar o token e retorná-lo como resposta
