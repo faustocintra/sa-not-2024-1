@@ -2,18 +2,6 @@ import prisma from '../database/client.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
-import sqlite3 from 'sqlite3'
-import { open } from 'sqlite'
-
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const basePath = __dirname.replaceAll('\\', '/').replace('/src/controllers', '')
-const dbPath = basePath + '/prisma/database/local.db'
-
 const controller = {}   // Objeto vazio
 
 controller.create = async function(req, res) {
@@ -36,10 +24,9 @@ controller.create = async function(req, res) {
 
 controller.retrieveAll = async function(req, res) {
   try {
-    const result = await prisma.user.findMany()
-    // Retorna o resultado com HTTP 200: OK (implícito)
+    if(!req?.authUser?.is_admin) return res.status(403).end()
 
-    // Exclui o campo "password" do resultado
+    const result = await prisma.user.findMany()
     for(let user of result) {
       if(user.password) delete user.password
     }
@@ -78,10 +65,10 @@ controller.retrieveOne = async function(req, res) {
 
 controller.update = async function(req, res) {
   try {
-
-    // Se tiver sido passado o campo 'password' no body
-    // da requisição, precisamos criptografá-lo antes de
-    // enviar ao banco de dados
+    if(!req?.authUser?.is_admin && Number(req?.authUser.id) !== Number(req.params.id)) {
+      res.status(403).end()
+    }
+    
     if(req.body.password) req.body.password = await bcrypt.hash(req.body.password, 12)
 
     const result = await prisma.user.update({
@@ -119,34 +106,22 @@ controller.delete = async function(req, res) {
 }
 
 controller.login = async function(req, res) {
-  const query = `select * from user where username = ?;`
-  console.log({query})
-
   try {
-    const db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database
+    // Busca o usuário pelo username
+    const user = await prisma.user.findUnique({
+      where: { username: req.body.username.toLowerCase() }
     })
-
-    // const user = await db.get(query)
-    const user = await db.get(query, [req.body.username])
 
     // Se o usuário não for encontrado ~>
     // HTTP 401: Unauthorized
-    if(! user) {
-      console.error('ERRO: usuário não encontrado.')
-      return res.status(401).end()
-    }
+    if(! user) return res.status(401).end()
 
     // Usuário encontrado, vamos conferir a senha
     const passwordMatches = await bcrypt.compare(req.body.password, user.password)
 
     // Se a senha estiver incorreta ~>
     // HTTP 401: Unauthorized
-    if(! passwordMatches) {
-      console.error('ERRO: senha inválida.')
-      return res.status(401).end()
-    }
+    if(! passwordMatches) return res.status(401).end()
 
     // Se chegamos até aqui, username + password estão OK
     // Vamos criar o token e retorná-lo como resposta
