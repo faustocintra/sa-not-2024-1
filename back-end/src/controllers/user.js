@@ -32,6 +32,11 @@ controller.create = async function(req, res) {
 
 controller.retrieveAll = async function(req, res) {
   try {
+    // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
+    // Somente usuários no nível administrador podem ter acesso à listagem de todos
+    // os usários. Caso contrário, retorna HTTP 403: Frobidden
+    if (!req?.authUser?.is_admin) return res.status(403).end();
+
     const result = await prisma.user.findMany();
     // Retorna o resultado com HTTP 200: OK (implícito)
 
@@ -75,6 +80,13 @@ controller.retrieveOne = async function(req, res) {
 
 controller.update = async function(req, res) {
   try {
+    // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
+    // Usuário que não seja administrador somente pode alterar o próprio cadastro
+    if ((!req?.authUser?.is_admin) && Number(req?.authUser?.id) !== Number(req.params.id)) {
+      // HTTP 403: Forbidden
+      res.status(403).end();
+    }
+
     // Se tiver sido passado o campo 'password' no body
     // da requisição, precisamos criptografá-lo antes de
     // enviar ao banco de dados
@@ -116,29 +128,15 @@ controller.delete = async function(req, res) {
 }
 
 controller.login = async function(req, res) {
-  // ATENÇÃO: a consulta abaixo pode facilitar um ataque de SQL Injection
-  // const query = `select * from user where username = '${req.body.username}';`;
-
-  const query = `select * from user where username ?;`;
-  console.log({ query });
-
   try {
-    const db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database
+    // Busca o usuário pelo username
+    const user = await prisma.user.findUnique({
+      where: { username: req.body.username.toLowerCase() }
     });
-
-    // SQL Injection
-    // const user = await db.get(query);
-
-    // Executando a consulta com parâmetro para prevenir SQL Injection
-    const user = await db.query([query, req.body.username]);
-    console.log(user);
 
     // Se o usuário não for encontrado ~>
     // HTTP 401: Unauthorized
     if (!user) {
-      console.error('ERRO: usuário não encontrado.');
       return res.status(401).end();
     }
 
@@ -148,7 +146,6 @@ controller.login = async function(req, res) {
     // Se a senha estiver incorreta ~>
     // HTTP 401: Unauthorized
     if (!passwordMatches) {
-      console.error('ERRO: senha inválida.');
       return res.status(401).end();
     }
 
