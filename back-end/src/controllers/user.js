@@ -151,4 +151,11 @@ controller.login = async function(req, res) {
   }
 }
 
+controller.me = function(req, res){
+
+  if(req.authUser) res.send(req.authUser)
+  else res.status(401).end()
+
+}
+
 export default controller
