@@ -153,5 +153,10 @@ controller.login = async function(req, res) {
     res.status(500).send(error)
   }
 }
+
+controller.me = function(req, res){
+  if(req.authUser) res.send(req.authUser)
+  else res.status(401).end()
+}
  
 export default controller
