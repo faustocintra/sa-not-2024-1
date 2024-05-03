@@ -2,18 +2,6 @@ import prisma from '../database/client.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
-import sqlite3 from 'sqlite3'
-import { open } from 'sqlite'
-
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const basePath = __dirname.replaceAll('\\', '/').replace('/src/controllers', '')
-const dbPath = basePath + '/prisma/database/local.db'
-
 const controller = {}   // Objeto vazio
 
 controller.create = async function(req, res) {
@@ -36,6 +24,13 @@ controller.create = async function(req, res) {
 
 controller.retrieveAll = async function(req, res) {
   try {
+
+    // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
+    // Somente usuários do nível administrador podem ter acesso à listagem de todos
+    // os usuários
+    // Caso contrário, retorna HTTP 403: Forbidden
+    if(! req?.authUser?.is_admin) return res.status(403).end()
+
     const result = await prisma.user.findMany()
     // Retorna o resultado com HTTP 200: OK (implícito)
 
@@ -79,6 +74,13 @@ controller.retrieveOne = async function(req, res) {
 controller.update = async function(req, res) {
   try {
 
+    // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
+    // Usuário que não seja administrador somente pode alterar o próprio cadastro
+    if((! req?.authUser?.is_admin) && Number(req?.authUser?.id) !== Number(req.params.id)) {
+      // HTTP 403: Forbidden
+      res.status(403).end()
+    }
+
     // Se tiver sido passado o campo 'password' no body
     // da requisição, precisamos criptografá-lo antes de
     // enviar ao banco de dados
@@ -119,23 +121,11 @@ controller.delete = async function(req, res) {
 }
 
 controller.login = async function(req, res) {
-  // const query = `select * from user where username = '${req.body.username}';`
-
-  const query = `select * from user where username = ?;`
-  console.log({query})
-
   try {
-    const db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database
+    // Busca o usuário pelo username
+    const user = await prisma.user.findUnique({
+      where: { username: req.body.username.toLowerCase() }
     })
-
-    // SQL Injection
-    // const user = await db.get(query)
-
-    // Executando a consulta com parametro para prevenir SQL Injection
-    const user = await db.get(query,[req.body.username])
-    console.log(user)
 
     // Se o usuário não for encontrado ~>
     // HTTP 401: Unauthorized
