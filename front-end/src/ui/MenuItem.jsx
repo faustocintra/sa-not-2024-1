@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import AuthUserContext from "../context/AuthUserContext";
 
 
-export default function MenuItem(userlevel = 0, dest, children) {
+// eslint-disable-next-line react/prop-types
+export default function MenuItem({ userlevel = 0, dest, children }) {
     const { authUser } = useContext(AuthUserContext);
 
     if ((userlevel === 0) ||
