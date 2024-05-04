@@ -60,6 +60,7 @@ export default function AppHeader() {
       <ol style={{ listStyleType: 'none', display: 'flex' }}>
         <MenuItem dest={"/"} children={"Página Inicial"}/>
         <MenuItem dest={"/users"} userLevel={2} children={"Usuários"}/>
+        <MenuItem dest={"/brute-force"} userLevel={1} children={"Força Bruta"}/>
         <AuthControl />
       </ol>
     </>
