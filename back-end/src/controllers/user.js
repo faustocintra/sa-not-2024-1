@@ -164,6 +164,18 @@ controller.login = async function(req, res) {
     // da senha antes de prosseguir
     if(user.password) delete user.password
 
+    controller.me = function(req, res) {
+      // Se houver usuário autenticado, ele foi salvo em req.authUser
+      // pelo middleware auth quando este conferiu o token. Portanto,
+      // para enviar informações do usuário logado ao front-end, basta
+      // responder com req.authUser
+      if(req.authUser) res.send(req.authUser)
+      // Se req.authUser não existir, significa que não há usuário
+      // autenticado
+      // HTTP 401: Unauthorized
+      else res.status(401).end()
+    }
+
     const token = jwt.sign(
       user,
       process.env.TOKEN_SECRET,   // Senha de criptografia do token
