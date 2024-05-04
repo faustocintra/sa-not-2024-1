@@ -66,5 +66,5 @@ export default function AppHeader() {
         <AuthControl key="#" />
       </ol>
     </>
-  )
+  );
 }

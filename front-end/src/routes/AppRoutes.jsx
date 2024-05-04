@@ -11,5 +11,5 @@ export default function AppRoutes() {
     <Route path="/login" element={ <LoginPage /> } />
     <Route path="/users" element={ <UserList /> } />
     <Route path="/users/:id" element={ <UserForm /> } />
-  </Routes>
+  </Routes>;
 }

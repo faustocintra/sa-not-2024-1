@@ -10,17 +10,17 @@ export default function(req, res, next) {
   const bypassRoutes = [
     { url: '/users/login', method: 'POST' },
     { url: '/users', method: 'POST' }
-  ]
+  ];
 
   /*
     Verifica se a rota atual está cadastrada em bypassRoutes. Caso
     esteja, passa para o próximo middleware (next()) sem verificar
     o token.
   */
-  for(let route of bypassRoutes) {
-    if(route.url === req.url && route.method === req.method) {
-      next()
-      return
+  for (let route of bypassRoutes) {
+    if (route.url === req.url && route.method === req.method) {
+      next();
+      return;
     }
   }
 
@@ -28,13 +28,13 @@ export default function(req, res, next) {
     Para todas as demais rotas, é necessário que o token tenha sido
     enviado no cabeçalho (header) 'authorization'.
   */
-  const authHeader = req.headers['authorization']
+  const authHeader = req.headers['authorization'];
 
   /*
     Se o cabeçalho 'authorization' não existir na requisição, retornamos
     HTTP 403: Forbidden
   */
-  if(! authHeader) return res.status(403).end()
+  if (!authHeader) return res.status(403).end();
 
   /*
     O cabeçalho 'authorization' é enviado como uma string no formato
@@ -42,7 +42,7 @@ export default function(req, res, next) {
     token, precisamos recortar a string no ponto onde há um espaço em
     branco e pegar somente a segunda parte
   */
-  const [ , token] = authHeader.split(' ')
+  const [ , token] = authHeader.split(' ');
 
   // VERIFICAÇÃO E VALIDAÇÃO DO TOKEN
   jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
@@ -51,18 +51,17 @@ export default function(req, res, next) {
       Se há erro, significa que o token é inválido ou está expirado
       HTTP 403: Forbidden
     */
-    if(error) return res.status(403).end()
+    if (error) return res.status(403).end();
 
     /*
       Se chegamos até aqui, o token está OK e temos as informações
       do usuário autenticado no parâmetro 'user'. Vamos guardá-lo
       dentro do 'req' para futura utilização
     */
-    req.authUser = user
+    req.authUser = user;
 
     // Continuamos para o próximo middleware
-    next()
-
-  })
+    next();
+  });
 
 }

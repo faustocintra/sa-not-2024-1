@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient({
   // Exibir todas as consultas SQL geradas no console
@@ -8,6 +8,6 @@ const prisma = new PrismaClient({
       level: 'query'
     }
   ]
-})
+});
 
-export default prisma
+export default prisma;
