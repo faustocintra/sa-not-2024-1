@@ -171,4 +171,20 @@ controller.login = async function(req, res) {
   }
 }
 
+controller.me = function(req, res) {
+
+  if (req.authUser) {
+    // Se houver usuário autenticado, ele foi salvo em req.authUser
+    // pelo middleware auth quando este conferiu o token. Portanto,
+    // para enviar informações do usuário logado ao front-end, basta
+    // responder com req.authUser
+    res.send(req.authUser);
+  } else {
+    // Se req.authUser não existir, significa que não há usuário
+    // autenticado
+    // HTTP 401: Unauthorized
+    res.status(401).end();
+  }
+}
+
 export default controller;
