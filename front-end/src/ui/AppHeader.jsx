@@ -58,9 +58,10 @@ export default function AppHeader() {
       <h1>Segurança no Desenvolvimento de Aplicações</h1>
       <hr />
       <ol style={{ listStyleType: 'none', display: 'flex' }}>
-        <MenuItem dest="/">Página Inicial</MenuItem>
+        <MenuItem dest="/">Página inicial</MenuItem>
         <MenuItem userLevel={2} dest="/users">Usuários</MenuItem>
-        <AuthControl />
+        <MenuItem userLevel={1} dest="/brute-force">Força bruta</MenuItem>
+        <AuthControl key="#" />
       </ol>
     </>
   )
