@@ -22,8 +22,5 @@ yarn-error.log*
 # eslint
 .eslintcache
 
-# dotenv
-.env
-
 # database
 local.db*
