@@ -19,4 +19,7 @@ model User{
   username    String      @unique  // Nome do usuario
   password    String      // Senha
   is_admin    Boolean     @default(false)
+  login_attempts Int @default(0) // Quantidade de tentativas
+  delay_level Int @default(0) // Nivel de castigo de disparo
+  last_attempt     DateTime?   // Data/hora da última tentativa
 }
