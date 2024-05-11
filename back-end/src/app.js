@@ -11,6 +11,10 @@ import indexRouter from "./routes/index.js";
 
 const app = express();
 
+import helmet from 'helmet'
+app.use(helmet())
+
+
 import cors from 'cors'
 app.use(cors({
   origin: process.env.FRONT_END_SERVER.split(','),

