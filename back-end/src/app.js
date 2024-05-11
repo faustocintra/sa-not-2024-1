@@ -11,6 +11,11 @@ import indexRouter from "./routes/index.js";
 
 const app = express();
 
+//Helmet é um pacote para medidas de segurança como esconder a tecnologia
+// do back end entre outras
+import helmet from 'helmet'
+app.use(helmet())
+
 import cors from 'cors'
 app.use(cors({
   origin: process.env.FRONT_END_SERVER.split(','),
@@ -28,6 +33,12 @@ app.use("/", indexRouter);
 // MIDDLEWARE DE AUTENTICAÇÃO
 import auth from './middleware/auth.js'
 app.use(auth)
+
+//MIDDLEWARE DE LIMITAÇÃO DE TAXA DE ACESSO
+
+//Todas as rotas serão afetadas
+// import rateLimiter from './middleware/rate-limiter.js'
+// app.use(rateLimiter)
 
 /**************************************************
  * ROTAS
