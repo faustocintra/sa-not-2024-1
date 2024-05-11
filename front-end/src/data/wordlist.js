@@ -165028,7 +165028,7 @@ const wordlist = [
     "zzward",
     "zzz",
     "zzzelda",
-    
+    "SenhaForte@1234"
   ]
   
 export default wordlist
