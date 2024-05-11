@@ -19,4 +19,7 @@ model User {
   username      String      @unique   // Nome de usuário
   password      String      // Senha
   is_admin      Boolean     @default(false)
+  login_attemps Int         @default(0)
+  delay_level   Int         @default(0)
+  last_attempt  DateTime?
 }
