@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import controller from '../controllers/user.js'
+import rateLimiter from '../middleware/rate-limiter.js'
 
 const router = Router()
 
@@ -9,6 +10,6 @@ router.get('/', controller.retrieveAll)
 router.get('/:id', controller.retrieveOne)
 router.put('/:id', controller.update)
 router.delete('/:id', controller.delete)
-router.post('/login', controller.login)
+router.post('/login', rateLimiter, controller.login)
 
 export default router

@@ -11,6 +11,10 @@ import indexRouter from "./routes/index.js";
 
 const app = express();
 
+import helmet from 'helmet'
+app.use(helmet())
+
+
 import cors from 'cors'
 app.use(cors({
   origin: process.env.FRONT_END_SERVER.split(','),
@@ -28,6 +32,7 @@ app.use("/", indexRouter);
 // MIDDLEWARE DE AUTENTICAÇÃO
 import auth from './middleware/auth.js'
 app.use(auth)
+
 
 /**************************************************
  * ROTAS
