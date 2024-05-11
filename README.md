@@ -24,6 +24,9 @@ npx prisma migrate dev --name nome-da-migration
 ## Comando para exibir/editar os dados do BD
 npx prisma studio
 
+## Dependencias
+npm install date-fns
+
 # Projeto front-end
 
 ## Comando para criação do projeto
