@@ -2,14 +2,6 @@ import prisma from '../database/client.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { format, addMinutes } from 'date-fns';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const basePath = __dirname.replaceAll('\\', '/').replace('/src/controllers', '');
-const dbPath = basePath + '/prisma/database/local.db';
 
 const controller = {};
 
