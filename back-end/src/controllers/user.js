@@ -133,40 +133,35 @@ controller.delete = async function(req, res) {
 */
 function getUserLoginParams(user) {
   // Recuperamos os níveis de atraso da variável de ambiente
-  const delayLevels = process.env.DELAY_LEVELS.split(',')
+  const delayLevels = process.env.DELAY_LEVELS.split(',');
 
   // Determinamos o nível de atraso atual e o próximo nível 
-  let currentDelayLevel, nextDelayLevel
-  if(user.delay_level < delayLevels.length - 1) {
-    currentDelayLevel = user.delay_level
-    nextDelayLevel = currentDelayLevel + 1
-  }
-  else if(user.delay_level === delayLevels.length) {
-    currentDelayLevel = user.delay_level
-    nextDelayLevel = currentDelayLevel
-  }
-  else {
-    currentDelayLevel = delayLevels.length - 1
-    nextDelayLevel = delayLevels.length - 1
+  let currentDelayLevel, nextDelayLevel;
+  if (user.delay_level < delayLevels.length - 1) {
+    currentDelayLevel = user.delay_level;
+    nextDelayLevel = currentDelayLevel + 1;
+  } else if (user.delay_level === delayLevels.length) {
+    currentDelayLevel = user.delay_level;
+    nextDelayLevel = currentDelayLevel;
+  } else {
+    currentDelayLevel = delayLevels.length - 1;
+    nextDelayLevel = delayLevels.length - 1;
   }
 
   // Determinamos o números minutos de atraso do nível atual
   // e do próximo nível
-  const currentDelayMinutes = Number(delayLevels[currentDelayLevel])
-  const nextDelayMinutes = Number(delayLevels[nextDelayLevel])
+  const currentDelayMinutes = Number(delayLevels[currentDelayLevel]);
+  const nextDelayMinutes = Number(delayLevels[nextDelayLevel]);
 
   // Determinamos o momento do último login e a data/hora após as quais
   // o usuário poderá tentar fazer login novamente
-  const lastLogin = user.last_attempt ? user.last_attempt : null
-  const canLoginAfter = lastLogin ? addMinutes(lastLogin, currentDelayMinutes) : new Date(1900, 1, 1)
+  const lastLogin = user.last_attempt ? user.last_attempt : null;
+  const canLoginAfter = lastLogin ? addMinutes(lastLogin, currentDelayMinutes) : new Date(1900, 1, 1);
 
   // Determinamos o número de tentativas atuais e o próximo número de tentativas
   // Sendo atingido o máximo de tentativas, a contagem reinicia em 0
   const currentLoginAttempts = user.login_attempts
-  const nextLoginAttempts = 
-    currentLoginAttempts < Number(process.env.MAX_LOGIN_ATTEMPTS) ?
-    currentLoginAttempts + 1 :
-    0
+  const nextLoginAttempts =  currentLoginAttempts < Number(process.env.MAX_LOGIN_ATTEMPTS) ? currentLoginAttempts + 1 : 0;
 
   return {
     currentDelayLevel, 
@@ -205,30 +200,28 @@ controller.login = async function(req, res) {
 
     // Usuário encontrado, precisamos verificar se ele ainda tem
     // tentativas de login disponíveis ou se o tempo de atraso já expirou
-    if(user.login_attempts > Number(process.env.MAX_LOGIN_ATTEMPTS) &&
-      new Date() < canLoginAfter) {
+    if (user.login_attempts >= Number(process.env.MAX_LOGIN_ATTEMPTS) && new Date() < canLoginAfter) {
       // Avisa que o usuário poderá tentar de novo após XXX milissegundos
-      res.setHeader('Retry-After', currentDelayMinutes * 60 * 1000)
+      res.setHeader('Retry-After', currentDelayMinutes * 60 * 1000);
       // HTTP 429: Too Many Attempts
-      return res.status(429).end()
+      return res.status(429).end();
     }
 
     // Usuário encontrado, vamos conferir a senha
     const passwordMatches = await bcrypt.compare(req.body.password, user.password);
 
     // Se a senha estiver incorreta
-    if(! passwordMatches) {
+    if (!passwordMatches) {
       // Incrementa o número de tentativas do usuário
-      if(currentLoginAttempts < Number(process.env.MAX_LOGIN_ATTEMPTS) - 1) {
+      if (currentLoginAttempts < Number(process.env.MAX_LOGIN_ATTEMPTS) - 1) {
         await prisma.user.update({
           where: { username: req.body.username.toLowerCase() },
           data: { 
             login_attempts: nextLoginAttempts,
             last_attempt: new Date()   // Hora atual
           }
-        })
-      }
-      else {
+        });
+      } else {
         // Igualou o número máximo de tentativas, sobe o nível
         // de espera para novas tentativas
         await prisma.user.update({
@@ -238,15 +231,15 @@ controller.login = async function(req, res) {
             delay_level: nextDelayLevel,
             last_attempt: new Date()   // Hora atual
           }
-        })
+        });
       }
       // HTTP 401: Unauthorized
-      return res.status(401).end()
+      return res.status(401).end();
     }
 
     // Se chegamos até aqui, username + password estão OK
-     // Resetamos o número de tentativas e o nível de espera
-     await prisma.user.update({
+    // Resetamos o número de tentativas e o nível de espera
+    await prisma.user.update({
       where: { username: req.body.username.toLowerCase() },
       data: { 
         login_attempts: 0,
