@@ -13,7 +13,7 @@ export default function MenuItem( { userLevel = 0, dest, children }) {
 
   if((userLevel === 0) || 
      (userLevel === 1 && authUser) ||
-     (userLevel === 2 && authUser.is_admin)) {
+     (userLevel === 2 && authUser?.is_admin)) {
     return (
       <li key={dest} style={{ marginRight: '12px' }}>
         <Link to={dest}>{children}</Link>

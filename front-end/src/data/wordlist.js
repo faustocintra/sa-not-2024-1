@@ -37,6 +37,7 @@ const wordlist = [
   "1011990",
   "1011991",
   "1011992",
+  "SenhaForte@1234",
   "1011993",
   "1011994",
   "1011995",
@@ -165028,7 +165029,6 @@ const wordlist = [
   "zzward",
   "zzz",
   "zzzelda",
-  
 ]
 
 export default wordlist
