@@ -18,7 +18,7 @@ export default function LoginPage() {
       // Armazena o token recebido no localStorage
       // ATENÇÃO: ABORDAGEM NÃO SEGURA, há outros meios
       // mais adequados de armazenar o token com segurança
-      window.localStorage.setItem(import.meta.env.VITE_AUTH_TOKEN_NAME, result.token)
+      // window.localStorage.setItem(import.meta.env.VITE_AUTH_TOKEN_NAME, result.token)
 
       // Deu certo, vamos navegar para a página inicial
       navigate('/')

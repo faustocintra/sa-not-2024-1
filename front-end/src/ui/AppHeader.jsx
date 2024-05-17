@@ -21,11 +21,14 @@ export default function AppHeader() {
     })()
   }, [location])
 
-  function handleLogoutClick() {
+  async function handleLogoutClick() {
     if (confirm('Deseja realmente sair?')) {
-      setAuthUser(null)
-      window.localStorage.removeItem(import.meta.env.VITE_AUTH_TOKEN_NAME)
-      navigate('/login')
+      try {
+        await myfetch.post('/user/logout')
+        navigate('/login')
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
   function AuthControl() {

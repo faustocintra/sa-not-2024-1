@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 
-export default function(req, res, next) {
+export default function (req, res, next) {
 
   /*
     Algumas rotas, como /users/login, devem poder ser acessadas
@@ -17,32 +17,23 @@ export default function(req, res, next) {
     esteja, passa para o próximo middleware (next()) sem verificar
     o token.
   */
-  for(let route of bypassRoutes) {
-    if(route.url === req.url && route.method === req.method) {
+  for (let route of bypassRoutes) {
+    if (route.url === req.url && route.method === req.method) {
       next()
       return
     }
   }
 
-  /*
-    Para todas as demais rotas, é necessário que o token tenha sido
-    enviado no cabeçalho (header) 'authorization'.
-  */
-  const authHeader = req.headers['authorization']
+  let token = null
+  token = req.cookies[process.env.AUTH_COOKIE_NAME]
 
-  /*
-    Se o cabeçalho 'authorization' não existir na requisição, retornamos
-    HTTP 403: Forbidden
-  */
-  if(! authHeader) return res.status(403).end()
+  if (!token) {
+    const authHeader = req.headers['authorization']
+    if (!authHeader) return res.status(403).end()
 
-  /*
-    O cabeçalho 'authorization' é enviado como uma string no formato
-    "Bearer: XXXXX", onde "XXXXX" é o token. Portanto, para extrair o
-    token, precisamos recortar a string no ponto onde há um espaço em
-    branco e pegar somente a segunda parte
-  */
-  const [ , token] = authHeader.split(' ')
+    const authHeaderParts = authHeader.split(' ')
+    token = authHeaderParts[1]
+  }
 
   // VERIFICAÇÃO E VALIDAÇÃO DO TOKEN
   jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
@@ -51,7 +42,7 @@ export default function(req, res, next) {
       Se há erro, significa que o token é inválido ou está expirado
       HTTP 403: Forbidden
     */
-    if(error) return res.status(403).end()
+    if (error) return res.status(403).end()
 
     /*
       Se chegamos até aqui, o token está OK e temos as informações
