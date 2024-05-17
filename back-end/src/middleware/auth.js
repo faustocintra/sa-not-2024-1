@@ -24,17 +24,32 @@ export default function(req, res, next) {
     }
   }
 
+  let token = null
+
+  token = req.cookies[process.env.AUTH_COOKIE_NAME]
+
+
+  if(! token ){
+    const authHeader = req.headers['authorization']
+
+    if(! authHeader) return res.status(403).end()
+
+    const authHeaderParts = authHeader.split('')
+
+    token = authHeaderParts[1]
+  }
+
   /*
     Para todas as demais rotas, é necessário que o token tenha sido
     enviado no cabeçalho (header) 'authorization'.
   */
-  const authHeader = req.headers['authorization']
+  // const authHeader = req.headers['authorization']
 
   /*
     Se o cabeçalho 'authorization' não existir na requisição, retornamos
     HTTP 403: Forbidden
   */
-  if(! authHeader) return res.status(403).end()
+  // if(! authHeader) return res.status(403).end()
 
   /*
     O cabeçalho 'authorization' é enviado como uma string no formato
@@ -42,7 +57,7 @@ export default function(req, res, next) {
     token, precisamos recortar a string no ponto onde há um espaço em
     branco e pegar somente a segunda parte
   */
-  const [ , token] = authHeader.split(' ')
+  // const [ , token] = authHeader.split(' ')
 
   // VERIFICAÇÃO E VALIDAÇÃO DO TOKEN
   jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
