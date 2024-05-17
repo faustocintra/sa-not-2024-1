@@ -36,6 +36,7 @@ npm install date-fns
 npm i express-limit
 npm i nodemon
 npm install helmet
+npm install zod
 
 # Projeto front-end
 
