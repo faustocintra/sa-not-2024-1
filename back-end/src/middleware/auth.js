@@ -1,67 +1,72 @@
-import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken'
 
 export default function(req, res, next) {
 
-    /*
-       ALgumas rotas, como /users/login, devem poder ser acessadas
-       sem a necessidde de fornecimento de um token. Tais rotas
-       são cadastradas no vetor bypassRoutes.
-    */
-   const bypassRoutes = [
+  /*
+    Algumas rotas, como /users/login, devem poder ser acessadas
+    sem a necessidade de fornecimento de um token. Tais rotas
+    são cadastradas no vetor bypassRoutes.
+  */
+  const bypassRoutes = [
     { url: '/users/login', method: 'POST' },
-    { url: '/users', method: 'POST'}
-   ]
+    { url: '/users', method: 'POST' }
+  ]
 
-   /*
-      Verifica se a rota atual está cadastrada em bypassRoutes. Caso
-      esteja, passa para  próximo middleware.(next()) sem verificar
-      o token.
-   */
+  /*
+    Verifica se a rota atual está cadastrada em bypassRoutes. Caso
+    esteja, passa para o próximo middleware (next()) sem verificar
+    o token.
+  */
   for(let route of bypassRoutes) {
     if(route.url === req.url && route.method === req.method) {
-        next()
-        return
+      next()
+      return
     }
   }
 
-  /*
-    Para todas as demais rotas, é necessário que o token tenha sido
-    enviado no cabeçalho (header) 'Authorization'.
-  */
- const authHeader = req.headers['authorization']
+  /* PROCESSO DE VERIFICAÇÃO DO TOKEN DE AUTENTICAÇÃO */
+  let token = null
 
- /*
-    Se o cabeçalho 'Authorization' não existir na requisição, retornamos
-    HTTp 403: Forbidden.
- */
-  if(! authHeader) return res.status(403).end()
+  // 1. Procura o token em um cookie
+  token = req.cookies[process.env.AUTH_COOKIE_NAME]
+  console.log({ AUTH_COOKIE: token })
   
-  /*
-    O cabeçalho 'Authorization' é enviado como uma string no formato
-    "Bearer: XXXXX", onde "XXXXX" é o token. Portanto, para extrair o
-    token, precisamos recortar a string no ponto onde há um espaço em 
-    branco e pegar somente a segunda parte.
-  */
-  const[ , token] = authHeader.split(' ')
- 
+  // 2. Se o cookie contendo o token não existir, procuramos
+  // no cabeçalho de autorização
+  if(! token) {
+
+    // O token pode ter sido enviado no cabeçalho "authorization"
+    const authHeader = req.headers['authorization']
+
+    // O token não foi encontrado nem no header ~> HTTP 403: Forbidden
+    if (! authHeader) return res.status(403).end()
+
+    // Divide o cabeçalho em duas partes, separadas por um espaço
+    const authHeaderParts = authHeader.split(' ')
+
+    // O token corresponde à segunda parte do cabeçalho
+    token = authHeaderParts[1]
+  }
+
   // VERIFICAÇÃO E VALIDAÇÃO DO TOKEN
   jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
-    
+
     /* 
       Se há erro, significa que o token é inválido ou está expirado
       HTTP 403: Forbidden
     */
     if(error) return res.status(403).end()
+
     /*
       Se chegamos até aqui, o token está OK e temos as informações
-      do usuário autenticado no parâmetro "user". Vamos guardá-lo
-      dentro do 'req' para futura utilização. 
+      do usuário autenticado no parâmetro 'user'. Vamos guardá-lo
+      dentro do 'req' para futura utilização
     */
-   req.authUser = user
+    req.authUser = user
 
-   // Continuamos para o próximo middleware
-   next()
-   
+    // Continuamos para o próximo middleware
+    next()
+
   })
 
 }
