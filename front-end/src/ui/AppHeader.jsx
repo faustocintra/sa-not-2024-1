@@ -26,6 +26,19 @@ export default function AppHeader() {
     })
   }, [location])
 
+  async function handleLogoutClick() {
+    if(confirm('Deseja realmente sair?')) {
+      try {
+        await myfetch.post('/users/logout')
+        navigate('/login')
+      }
+      catch(error) {
+        console.error(error)
+        alert('ERRO DO SERVIDOR:', + error.message)
+      }
+    }
+  }
+
   function handleLogoutClick() {
     if(confirm('Deseja realmente sair?')) {
       // Tira da memória as informações sobre o usuário autenticado
