@@ -39,6 +39,17 @@ export default function AppHeader() {
     }
   }
 
+  async function handleLogoutClick() {
+    if(confirm("Deseja realmente sair")){
+      try {
+        await myfetch.post('users/logout')
+        navigate('/login')
+      } catch (error) {
+        alert('ERRO DO SERVIDOR' + error.message)
+      }
+    }
+  }
+
   function AuthControl() {
     if(authUser) return (
       <li style={{ marginLeft: '36px' }}>
