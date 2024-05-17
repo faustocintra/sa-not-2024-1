@@ -24,26 +24,18 @@ export default function(req, res, next) {
     }
   }
 
-  /*
-    Para todas as demais rotas, é necessário que o token tenha sido
-    enviado no cabeçalho (header) 'authorization'.
-  */
-  const authHeader = req.headers['authorization']
+  const token = req.cookies[process.env.AUTH_COOKIE_NAME]
+  console.log({AUTH_COOKIE : token});
 
-  /*
-    Se o cabeçalho 'authorization' não existir na requisição, retornamos
-    HTTP 403: Forbidden
-  */
-  if(! authHeader) return res.status(403).end()
+  if(!token) {
+    const authHeader = req.headers['authorization']
 
-  /*
-    O cabeçalho 'authorization' é enviado como uma string no formato
-    "Bearer: XXXXX", onde "XXXXX" é o token. Portanto, para extrair o
-    token, precisamos recortar a string no ponto onde há um espaço em
-    branco e pegar somente a segunda parte
-  */
-  const [ , token] = authHeader.split(' ')
+    if(!authHeader) return res.status(403).end()
 
+    const authHeaderParts = authHeader.split(' ')
+    token = authHeaderParts[1]
+  }
+  
   // VERIFICAÇÃO E VALIDAÇÃO DO TOKEN
   jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
 

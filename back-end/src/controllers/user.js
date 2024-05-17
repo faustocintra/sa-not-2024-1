@@ -262,8 +262,16 @@ controller.login = async function(req, res) {
       { expiresIn: '24h' }  // Prazo de validade do token
     )
 
+    res.cookie(process.env.AUTH_COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      path:'/',
+      maxAge: 25 * 60 * 60 * 100 
+    })
+
     // Retorna o token com status HTTP 200: OK (implícito)
-    res.send({token})
+    res.status(204).end();
 
   }
   catch(error) {
@@ -271,6 +279,11 @@ controller.login = async function(req, res) {
     // HTTP 500: Internal Server Error
     res.status(500).send(error)
   }
+}
+
+controller.logout = function(req, res) {
+  res.clearCookie(process.env.AUTH_COOKIE_NAME)
+  res.status(204).end()
 }
 
 controller.me = function(req, res) {

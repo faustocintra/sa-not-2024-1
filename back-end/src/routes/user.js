@@ -11,5 +11,6 @@ router.get('/:id', controller.retrieveOne)
 router.put('/:id', controller.update)
 router.delete('/:id', controller.delete)
 router.post('/login', rateLimiter, controller.login)
+router.post('/logout', controller.logout)
 
 export default router
