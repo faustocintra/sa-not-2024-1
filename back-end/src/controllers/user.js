@@ -3,26 +3,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { format, addMinutes } from "date-fns";
 
-import sqlite3 from "sqlite3";
-import { open } from "sqlite";
-
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const basePath = __dirname
-  .replaceAll("\\", "/")
-  .replace("/src/controllers", "");
-const dbPath = basePath + "/prisma/database/local.db";
-
 const controller = {}; // Objeto vazio
 
 controller.create = async function (req, res) {
   try {
     // Criptografando a senha
-    req.body.password >= (await bcrypt.hash(req.body.password, 12));
+    req.body.password = await bcrypt.hash(req.body.password, 12);
 
     await prisma.user.create({ data: req.body });
 
@@ -37,6 +23,12 @@ controller.create = async function (req, res) {
 
 controller.retrieveAll = async function (req, res) {
   try {
+    // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
+    // Somente usuários do nível administrador podem ter acesso à listagem de todos
+    // os usuários
+    // Caso contrário, retorna HTTP 403: Forbidden
+    if (!req?.authUser?.is_admin) return res.status(403).end();
+
     const result = await prisma.user.findMany();
     // Retorna o resultado com HTTP 200: OK (implícito)
 
@@ -77,6 +69,16 @@ controller.retrieveOne = async function (req, res) {
 
 controller.update = async function (req, res) {
   try {
+    // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
+    // Usuário que não seja administrador somente pode alterar o próprio cadastro
+    if (
+      !req?.authUser?.is_admin &&
+      Number(req?.authUser?.id) !== Number(req.params.id)
+    ) {
+      // HTTP 403: Forbidden
+      res.status(403).end();
+    }
+
     // Se tiver sido passado o campo 'password' no body
     // da requisição, precisamos criptografá-lo antes de
     // enviar ao banco de dados
@@ -170,32 +172,15 @@ function getUserLoginParams(user) {
 }
 
 controller.login = async function (req, res) {
-  // ATENÇÃO: a consulta abaixo pode facilitar um ataque de SQL Injection
-  //const query = `select * from user where username = '${req.body.username}';`
-
-  const query = `select * from user where username = ?;`;
-
-  console.log({ query });
-
   try {
-    const db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database,
+    // Busca o usuário pelo username
+    const user = await prisma.user.findUnique({
+      where: { username: req.body.username.toLowerCase() },
     });
-
-    // SQL Injection
-    //const user = await db.get(query)
-
-    // Executando a consulta com parâmetro para prevenir SQL Injection
-    const user = await db.get(query, [req.body.username]);
-    console.log(user);
 
     // Se o usuário não for encontrado ~>
     // HTTP 401: Unauthorized
-    if (!user) {
-      console.error("ERRO: usuário não encontrado.");
-      return res.status(401).end();
-    }
+    if (!user) return res.status(401).end();
 
     // Busca os parâmetros que serão usados na validação de tentativas
     // e intervalo de login
@@ -230,30 +215,31 @@ controller.login = async function (req, res) {
     );
 
     // Se a senha estiver incorreta
-    // HTTP 401: Unauthorized	    if(! passwordMatches) {
-    if (!passwordMatches) return res.status(401).end(); // Incrementa o número de tentativas do usuário
-    if (currentLoginAttempts < Number(process.env.MAX_LOGIN_ATTEMPTS) - 1) {
-      await prisma.user.update({
-        where: { username: req.body.username.toLowerCase() },
-        data: {
-          login_attempts: nextLoginAttempts,
-          last_attempt: new Date(), // Hora atual
-        },
-      });
-    } else {
-      // Igualou o número máximo de tentativas, sobe o nível
-      // de espera para novas tentativas
-      await prisma.user.update({
-        where: { username: req.body.username.toLowerCase() },
-        data: {
-          login_attempts: nextLoginAttempts,
-          delay_level: nextDelayLevel,
-          last_attempt: new Date(), // Hora atual
-        },
-      });
+    if (!passwordMatches) {
+      // Incrementa o número de tentativas do usuário
+      if (currentLoginAttempts < Number(process.env.MAX_LOGIN_ATTEMPTS) - 1) {
+        await prisma.user.update({
+          where: { username: req.body.username.toLowerCase() },
+          data: {
+            login_attempts: nextLoginAttempts,
+            last_attempt: new Date(), // Hora atual
+          },
+        });
+      } else {
+        // Igualou o número máximo de tentativas, sobe o nível
+        // de espera para novas tentativas
+        await prisma.user.update({
+          where: { username: req.body.username.toLowerCase() },
+          data: {
+            login_attempts: nextLoginAttempts,
+            delay_level: nextDelayLevel,
+            last_attempt: new Date(), // Hora atual
+          },
+        });
+      }
+      // HTTP 401: Unauthorized
+      return res.status(401).end();
     }
-    // HTTP 401: Unauthorized
-    return res.status(401).end();
 
     // Se chegamos até aqui, username + password estão OK
     // Resetamos o número de tentativas e o nível de espera
@@ -272,31 +258,50 @@ controller.login = async function (req, res) {
     // da senha antes de prosseguir
     if (user.password) delete user.password;
 
-    controller.me = function (req, res) {
-      // Se houver usuário autenticado, ele foi salvo em req.authUser
-      // pelo middleware auth quando este conferiu o token. Portanto,
-      // para enviar informações do usuário logado ao front-end, basta
-      // responder com req.authUser
-      if (req.authUser) res.send(req.authUser);
-      // Se req.authUser não existir, significa que não há usuário
-      // autenticado
-      // HTTP 401: Unauthorized
-      else res.status(401).end();
-    };
-
     const token = jwt.sign(
       user,
       process.env.TOKEN_SECRET, // Senha de criptografia do token
       { expiresIn: "24h" } // Prazo de validade do token
     );
 
+    // Formamos o cookie para enviar ao front-end
+    res.cookie(process.env.AUTH_COOKIE_NAME, token, {
+      httpOnly: true, // O cookie ficará inacessível para JS
+      secure: true,
+      sameSite: "Strict",
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000, // 24h em milissegundos
+    });
+
     // Retorna o token com status HTTP 200: OK (implícito)
-    res.send({ token });
+    //res.send({token})
+
+    // O token não é mais enviado na resposta
+    // A resposta agora é simplesmente HTTP 204: No Content
+    res.status(204).end();
   } catch (error) {
     console.error(error);
     // HTTP 500: Internal Server Error
     res.status(500).send(error);
   }
+};
+
+controller.logout = function (req, res) {
+  // Apaga o cookie que armazena o token de autorização
+  res.clearCookie(process.env.AUTH_COOKIE_NAME);
+  res.status(204).end();
+};
+
+controller.me = function (req, res) {
+  // Se houver usuário autenticado, ele foi salvo em req.authUser
+  // pelo middleware auth quando este conferiu o token. Portanto,
+  // para enviar informações do usuário logado ao front-end, basta
+  // responder com req.authUser
+  if (req.authUser) res.send(req.authUser);
+  // Se req.authUser não existir, significa que não há usuário
+  // autenticado
+  // HTTP 401: Unauthorized
+  else res.status(401).end();
 };
 
 export default controller;
