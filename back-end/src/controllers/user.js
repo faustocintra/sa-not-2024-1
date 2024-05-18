@@ -2,6 +2,8 @@ import prisma from '../database/client.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { format, addMinutes } from 'date-fns'
+import { ZodError } from 'zod'
+import Login from '../models/Login.js'
 
 const controller = {}   // Objeto vazio
 
@@ -177,6 +179,10 @@ function getUserLoginParams(user) {
 
 controller.login = async function(req, res) {
   try {
+
+    // Invoca a validação dos campos definida no model Login
+    Login.parse(req.body)
+
     // Busca o usuário pelo username
     const user = await prisma.user.findUnique({
       where: { username: req.body.username.toLowerCase() }
@@ -262,26 +268,35 @@ controller.login = async function(req, res) {
       { expiresIn: '24h' }  // Prazo de validade do token
     )
 
+    // Formamos o cookie para enviar ao front-end
     res.cookie(process.env.AUTH_COOKIE_NAME, token, {
-      httpOnly: true,
+      httpOnly: true,   // O cookie ficará inacessível para JS
       secure: true,
       sameSite: 'Strict',
-      path:'/',
-      maxAge: 25 * 60 * 60 * 100 
+      path: '/',
+      maxAge: 24 * 60 * 60 * 1000   // 24h em milissegundos
     })
 
     // Retorna o token com status HTTP 200: OK (implícito)
-    res.status(204).end();
+    //res.send({token})
+
+    // O token não é mais enviado na resposta
+    // A resposta agora é simplesmente HTTP 204: No Content
+    res.status(204).end()
 
   }
   catch(error) {
     console.error(error)
+    // HTTP 400: Bad Request
+    if (error instanceof ZodError) res.status(400).send(error.issues)
+    
     // HTTP 500: Internal Server Error
-    res.status(500).send(error)
+    else res.status(500).send(error)
   }
 }
 
 controller.logout = function(req, res) {
+  // Apaga o cookie que armazena o token de autorização
   res.clearCookie(process.env.AUTH_COOKIE_NAME)
   res.status(204).end()
 }
