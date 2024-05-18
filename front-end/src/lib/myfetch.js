@@ -40,6 +40,10 @@ function getOptions(body = null, method = 'GET') {
 
 function getErrorDescription(response) {
   switch(response.status) {
+
+    case 400: // Bad Request, provavelmente produzido pelo zod
+      return `ERRO: falha na validação de dados no servidor', ${response.statusText}`
+
     case 401:   // Unauthorized
       return 'ERRO: usuário ou senha incorretos'
 
@@ -55,28 +59,32 @@ function getErrorDescription(response) {
   }
 }
 
+function processResponse(response) {
+  if(response.ok) {
+    const isJson = response.headers.get('content-type')?.includes('application/json')
+    if(isJson) return response.json()
+    else return true
+  } else throw new HttpError(response.status, getErrorDescription(response))
+}
+
 myfetch.post = async function(path, body) {
   const response = await fetch(baseUrl + path, getOptions(body, 'POST'))
-  if(response.ok) return response.json()
-  else throw new HttpError(response.status, getErrorDescription(response))
+  return processResponse(response)
 }
 
 myfetch.put = async function(path, body) {
   const response = await fetch(baseUrl + path, getOptions(body, 'PUT'))
-  if(response.ok) return response.json()
-  else throw new HttpError(response.status, getErrorDescription(response))
+  return processResponse(response)
 }
 
 myfetch.get = async function(path) {
   const response = await fetch(baseUrl + path, getOptions())
-  if(response.ok) return response.json()
-  else throw new HttpError(response.status, getErrorDescription(response))
+  return processResponse(response)
 }
 
 myfetch.delete = async function(path) {
   const response = await fetch(baseUrl + path, getOptions(null, 'DELETE'))
-  if(response.ok) return response.json()
-  else throw new HttpError(response.status, getErrorDescription(response))
+  return processResponse(response)
 }
 
 export default myfetch
