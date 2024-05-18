@@ -1,10 +1,13 @@
 import React from 'react'
 import myfetch from '../lib/myfetch'
 import { useNavigate } from 'react-router-dom'
+import { ZodError } from 'zod'
+import Login from '../models/Login' 
 
 export default function LoginPage() {
   const [username, setUsername] = React.useState('')
   const [password, setPassword] = React.useState('')
+  const [inputErrors, setInputErrors] = React.useState(null)
 
   const navigate = useNavigate()
 
@@ -27,7 +30,19 @@ export default function LoginPage() {
     catch(error) {
       // Deu errado, permanecemos na página de login e 
       // informamos o usuário
-      alert('Usuário ou senha inválidos.')
+      console.error(error)
+
+      if(error instanceof ZodError) {
+        // Formamos um objeto contendo os erros do Zod e os colocamos na variável de estado
+        // inputErrors
+        const messages = {}
+        for (let i of error.issues) [i.path[0]] = i.message
+        setInputErrors(messages)
+        alert('Há campos com valores inválidos no formulário. Verifique.')
+      }
+
+      if(error.status === 400) alert(error.message)
+      else alert('Usuário ou senha inválidos.')
     }
   }
 
@@ -40,6 +55,9 @@ export default function LoginPage() {
           <label>
             <span>Usuário:</span><br />
             <input value={username} onChange={e => setUsername(e.target.value)} />
+            <div className="input-error">
+              { inputErrors?.username }
+            </div>
           </label>
         </div>
 
@@ -47,6 +65,9 @@ export default function LoginPage() {
           <label>
             <span>Senha:</span><br />
             <input value={password} type="password" onChange={e => setPassword(e.target.value)} />
+            <div className="input-error">
+              { inputErrors?.password }
+            </div>
           </label>
         </div>
 
