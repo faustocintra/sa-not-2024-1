@@ -1,16 +1,21 @@
 import React from 'react'
 import myfetch from '../lib/myfetch'
 import { useNavigate } from 'react-router-dom'
+import z from 'zod'
+import Login from '..models/Login'
 
 export default function LoginPage() {
   const [username, setUsername] = React.useState('')
   const [password, setPassword] = React.useState('')
+  const [inputErrors, setInputErrors] = Reacr.useState('')
 
   const navigate = useNavigate()
 
   async function handleSubmit(event) {
     event.preventDefault()    // Evita o recarregamento da tela
     try {
+
+      Login.parse({ username, password })
       // Em aplicações de produção, aqui deveria ser mostrado
       // algum feedback de espera para o usuário
       await myfetch.post('/users/login', { username, password })
@@ -26,7 +31,14 @@ export default function LoginPage() {
     catch(error) {
       // Deu errado, permanecemos na página de login e 
       // informamos o usuário
-      alert('Usuário ou senha inválidos.')
+      if(error instanceof z.ZodError) {
+        const messages = {}
+        for (let i of error.issues) messages[i.path[0] = i.message]
+        setInputErrors(messages)
+        alert('valores invalidos')
+      }
+      else if (error.status === 400) alert(error.message)
+      else alert('Usuário ou senha inválidos.')
     }
   }
 
@@ -39,6 +51,9 @@ export default function LoginPage() {
           <label>
             <span>Usuário:</span><br />
             <input value={username} onChange={e => setUsername(e.target.value)} />
+              <div className='input-error'>
+                {inputErrors?.username}
+              </div>
           </label>
         </div>
 

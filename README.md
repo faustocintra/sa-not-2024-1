@@ -52,6 +52,7 @@ Perguntas feitas pelo comando:
 # Instalação de dependências e inicialização do projeto
 cd front-end
 npm install
+npm i zod
 npm run dev
 
 # Instalação da biblioteca de roteamento

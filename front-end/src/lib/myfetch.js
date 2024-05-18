@@ -40,6 +40,9 @@ function getOptions(body = null, method = 'GET') {
 
 function getErrorDescription(response) {
   switch(response.status) {
+    case 400:
+      return 'ERRO: Falha na validação  dos dados no servidor, ${response.statusText}'
+
     case 401:   // Unauthorized
       return 'ERRO: usuário ou senha incorretos'
 
