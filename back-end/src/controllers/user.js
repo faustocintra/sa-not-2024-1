@@ -214,7 +214,7 @@ controller.login = async function (req, res) {
     // Usuário encontrado, precisamos verificar se ele ainda tem
     // tentativas de login disponíveis ou se o tempo de atraso já expirou
     if (
-      user.login_attempts > Number(process.env.MAX_LOGIN_ATTEMPTS) &&
+      user.login_attempts >= Number(process.env.MAX_LOGIN_ATTEMPTS) &&
       new Date() < canLoginAfter
     ) {
       // Avisa que o usuário poderá tentar de novo após XXX milissegundos
