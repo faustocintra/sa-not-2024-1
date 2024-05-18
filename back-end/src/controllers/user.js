@@ -2,6 +2,8 @@ import prisma from "../database/client.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { format, addMinutes } from "date-fns";
+import { ZodError } from 'zod'
+import Login from '../models/Login.js'
 
 const controller = {}   // Objeto vazio
 
@@ -177,6 +179,8 @@ function getUserLoginParams(user) {
 
 controller.login = async function(req, res) {
   try {
+
+    Login.parse(req.body)
     // Busca o usuário pelo username
     const user = await prisma.user.findUnique({
       where: { username: req.body.username.toLowerCase() }
@@ -280,9 +284,11 @@ controller.login = async function(req, res) {
 
   }
   catch(error) {
+
     console.error(error)
+    if(error instanceof ZodError) res.status(400).send(error.issues)
     // HTTP 500: Internal Server Error
-    res.status(500).send(error)
+    else res.status(500).send(error)
   }
 }
 

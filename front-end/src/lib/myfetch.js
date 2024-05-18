@@ -40,6 +40,9 @@ class HttpError extends Error {
  
  function getErrorDescription(response) {
    switch(response.status) {
+    case 400: 
+      return `ERRO: falha na validação de dados no servidor`
+
      case 401:   // Unauthorized
        return 'ERRO: usuário ou senha incorretos'
  
