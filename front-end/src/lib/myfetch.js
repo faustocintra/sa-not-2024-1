@@ -40,6 +40,9 @@ function getOptions(body = null, method = 'GET') {
 
 function getErrorDescription(response) {
   switch(response.status) {
+    case 400:   // Bad Request, provavelmente produzido pelo Zod
+      return 'ERRO: falha na validação de dados no servidor'
+
     case 401:   // Unauthorized
       return 'ERRO: usuário ou senha incorretos'
 
