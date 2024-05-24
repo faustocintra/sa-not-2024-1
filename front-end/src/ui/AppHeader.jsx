@@ -2,7 +2,7 @@ import React from 'react'
 import myfetch from '../lib/myfetch'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import AuthUserContext from '../context/AuthUserContext'
-import MenuItem from './MenuItem'
+import MenuItem from '../ui/MenuItem'
 
 export default function AppHeader() {
   const { authUser, setAuthUser } = React.useContext(AuthUserContext)
