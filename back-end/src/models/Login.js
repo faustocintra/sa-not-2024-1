@@ -8,6 +8,4 @@ export default z.object({
     password:
     z.string()
     .max(20, {message: 'A senha pode ter no maximo 200 catacter'}),
-
-    
 })
