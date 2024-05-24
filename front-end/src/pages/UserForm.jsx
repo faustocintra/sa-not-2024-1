@@ -2,11 +2,15 @@ import { useEffect, useState } from 'react';
 import myfetch from '../lib/myfetch';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useRef } from 'react';
+import { ZodError } from 'zod';
+import User from '../models/User';
 import './UserForm.css'
 
 export function UserForm() {
+    const [inputErrors, setInputErrors] = useState(null)
     const [state, setState] = useState({
-        user: {}
+        user: {},
+        inputErrors: null
     });
 
     const editPasswordRef = useRef()
@@ -37,6 +41,10 @@ export function UserForm() {
     function handleEditPasswordToggle(e) {
         if (e.target.checked) editPasswordRef.current.style.display = 'block'
         else editPasswordRef.current.style.display = 'none'
+
+        const userCopy = { ...user }
+        userCopy.changePassword = e.target.checked
+        setState({ ...state, user: userCopy })
     }
 
     function handleIsAdminClick(e) {
@@ -45,11 +53,30 @@ export function UserForm() {
         setState({ ...state, user: userCopy })
     }
 
+    async function handleSubmit(e) {
+        e.preventDefault()
+        try {
+            User.parse(user)
+
+            if (params.id) await myfetch.put(`/users/${params.id}`, user)
+            else await myfetch.post('/users', user)
+        } catch (error) {
+            console.log(error);
+            if (error instanceof ZodError) {
+                const messages = {}
+                for (let i of error.issues) messages[i.path[0]] = i.message
+                setState({ ...state, inputErrors: messages })
+                alert('Há campos com valores inválidos no formulário. Verefique.')
+            }
+            else alert('Usuário ou senha inválidos.')
+        }
+    }
+
     return (
         <>
             <h1>{params.id ? `Editando usuário ${params.fullname}` : 'Novo usuário'}</h1>
 
-            <form action="">
+            <form action="" onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="">
                         <span>Nome completo:</span>
@@ -59,6 +86,9 @@ export function UserForm() {
                             value={user.fullname}
                             onChange={handleFielChange}
                         />
+                        <div className="input-error">
+                            {inputErrors?.fullname}
+                        </div>
                     </label>
                 </div>
 
@@ -71,6 +101,9 @@ export function UserForm() {
                             value={user.username}
                             onChange={handleFielChange}
                         />
+                        <div className="input-error">
+                            {inputErrors?.username}
+                        </div>
                     </label>
                 </div>
 
@@ -88,6 +121,9 @@ export function UserForm() {
                             value={user.password}
                             onChange={handleFielChange}
                         />
+                        <div className="input-error">
+                            {inputErrors?.password}
+                        </div>
                     </label>
                     <label htmlFor="">
                         <span>Repita a senha:</span>
@@ -97,6 +133,9 @@ export function UserForm() {
                             value={user.password2}
                             onChange={handleFielChange}
                         />
+                        <div className="input-error">
+                            {inputErrors?.password2}
+                        </div>
                     </label>
                 </div>
 
