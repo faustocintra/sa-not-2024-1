@@ -288,10 +288,10 @@ controller.login = async function(req, res) {
   catch(error) {
     console.error(error)
     // HTTP 400: Bad Request
-    if(error instanceof ZodError) res.status(400).send(error.issues)
-
+    if (error instanceof ZodError) res.status(400).send(error.issues)
+    
     // HTTP 500: Internal Server Error
-    res.status(500).send(error)
+    else res.status(500).send(error)
   }
 }
 

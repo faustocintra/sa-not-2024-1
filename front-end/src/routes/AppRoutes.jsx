@@ -15,13 +15,11 @@ const guardedUserList = (
     <UserList />
   </AuthGuard>
 )
-
 const guardedUserForm = (
   <AuthGuard userLevel={2}>
     <UserForm />
   </AuthGuard>
 )
-
 const guardedBruteForce = (
   <AuthGuard userLevel={1}>
     <BruteForce />
@@ -34,6 +32,6 @@ export default function AppRoutes() {
     <Route path="/login" element={ <LoginPage /> } />
     <Route path="/users" element={ guardedUserList } />
     <Route path="/users/:id" element={ guardedUserForm } />
-    <Route path="/brute-force" element={ guardedBruteForce } />
+    <Route path="/brute-force" element={ guardedBruteForce } /> 
   </Routes>
 }
