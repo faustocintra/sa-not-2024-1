@@ -16,6 +16,9 @@ export default function AppRoutes() {
     <Route path="/users" element={<AuthGuard userLevel={2}>
       <UserList />
     </AuthGuard>} />
+    <Route path="/users/new" element={<AuthGuard userLevel={2}>
+      <UserForm />
+    </AuthGuard>} />
     <Route path="/users/:id" element={<AuthGuard userLevel={2}>
       <UserForm />
     </AuthGuard>} />
