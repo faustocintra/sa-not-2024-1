@@ -10,7 +10,7 @@ export default function MenuItem( { userLevel = 0, dest, children }) {
       2 ~> somente administrador
     */
     const { authUser } = React.useContext(AuthUserContext)
-  
+      
     if((userLevel === 0) || 
        (userLevel === 1 && authUser) ||
        (userLevel === 2 && authUser?.is_admin)) {

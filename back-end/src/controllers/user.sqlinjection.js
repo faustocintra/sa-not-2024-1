@@ -20,7 +20,7 @@ controller.create = async function(req, res) {
   try {
 
     // Criptografando a senha
-    req.body.password = await bcrypt.hash(req.body.password, 12)
+    req.body.password >= await bcrypt.hash(req.body.password, 12)
 
     await prisma.user.create({ data: req.body })
 
@@ -119,8 +119,11 @@ controller.delete = async function(req, res) {
 }
 
 controller.login = async function(req, res) {
-  const query = `select * from user where username = '${req.body.username}';`
-  // const query = `select * from user where username = ?;`
+ 
+  // ATENÇÃO: a consulta abaixo pode facilitar um ataque de SQL Injection
+  //const query = `select * from user where username = '${req.body.username}';`
+
+  const query = `select * from user where username = ?;`
 
   console.log({query})
 
@@ -130,8 +133,11 @@ controller.login = async function(req, res) {
       driver: sqlite3.Database
     })
 
-    const user = await db.get(query)
-    // const user = await db.get(query, [req.body.username])
+    // SQL Injection
+    //const user = await db.get(query)
+
+    // Executando a consulta com parâmetro para prevenir SQL Injection
+    const user = await db.get(query, [req.body.username])
     console.log(user)
 
     // Se o usuário não for encontrado ~>

@@ -26,10 +26,11 @@ export default function(req, res, next) {
 
   /* PROCESSO DE VERIFICAÇÃO DO TOKEN DE AUTENTICAÇÃO */
   let token = null
-
+  console.log({ AUTH_COOKIE_NAME: token })
+  console.log({ AUTH_COOKIE_NAME: process.env.AUTH_COOKIE_NAME });
   // 1. Procura o token em um cookie
   token = req.cookies[process.env.AUTH_COOKIE_NAME]
-  console.log({ AUTH_COOKIE: token })
+  console.log({ AUTH_COOKIE_NAME: token })
   
   // 2. Se o cookie contendo o token não existir, procuramos
   // no cabeçalho de autorização

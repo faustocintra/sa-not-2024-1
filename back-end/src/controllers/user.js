@@ -4,12 +4,14 @@ import jwt from "jsonwebtoken";
 import { format, addMinutes } from "date-fns";
 import { ZodError } from 'zod'
 import Login from '../models/Login.js'
+import getUserModel from "../models/User.js";
 
 const controller = {}   // Objeto vazio
 
 controller.create = async function(req, res) {
   try {
-
+    const User = getUserModel(true)
+    User.parse(req.body)
     // Criptografando a senha
     req.body.password = await bcrypt.hash(req.body.password, 12)
 
@@ -20,8 +22,9 @@ controller.create = async function(req, res) {
   }
   catch(error) {
     console.error(error)
+    if(error instanceof ZodError) res.status(400).send(error.issues)
     // HTTP 500: Internal Server Error
-    res.status(500).end()
+    else res.status(500).end()
   }
 }
 
@@ -84,6 +87,8 @@ controller.update = async function(req, res) {
       res.status(403).end()
     }
 
+    const User = getUserModel('password' in req.body)
+    User.parse(req.body)
     // Se tiver sido passado o campo 'password' no body
     // da requisição, precisamos criptografá-lo antes de
     // enviar ao banco de dados
@@ -101,6 +106,8 @@ controller.update = async function(req, res) {
   }
   catch(error) {
     console.error(error)
+
+    if(error instanceof ZodError) res.status(400).send(error.issues)
     // HTTP 500: Internal Server Error
     res.status(500).end()
   }
@@ -180,7 +187,9 @@ function getUserLoginParams(user) {
 controller.login = async function(req, res) {
   try {
 
+    // Invoca a validação dos campos definida no model Login
     Login.parse(req.body)
+
     // Busca o usuário pelo username
     const user = await prisma.user.findUnique({
       where: { username: req.body.username.toLowerCase() }
@@ -260,8 +269,7 @@ controller.login = async function(req, res) {
     // da senha antes de prosseguir
     if(user.password) delete user.password
 
-    const token = jwt.sign(
-      user,
+    const token = jwt.sign({userId: user.id},
       process.env.TOKEN_SECRET,   // Senha de criptografia do token
       { expiresIn: '24h' }  // Prazo de validade do token
     )
@@ -284,9 +292,10 @@ controller.login = async function(req, res) {
 
   }
   catch(error) {
-
     console.error(error)
-    if(error instanceof ZodError) res.status(400).send(error.issues)
+    // HTTP 400: Bad Request
+    if (error instanceof ZodError) res.status(400).send(error.issues)
+    
     // HTTP 500: Internal Server Error
     else res.status(500).send(error)
   }
