@@ -1,5 +1,5 @@
+import React from 'react'
 import './App.css'
-import React from "react";
 import { BrowserRouter } from 'react-router-dom'
 import AppHeader from './ui/AppHeader'
 import AppRoutes from './routes/AppRoutes'

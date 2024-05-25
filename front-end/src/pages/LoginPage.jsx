@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { ZodError } from 'zod'
 import Login from '../models/Login'
 
+
 export default function LoginPage() {
   const [username, setUsername] = React.useState('')
   const [password, setPassword] = React.useState('')
@@ -42,9 +43,9 @@ export default function LoginPage() {
         const messages = {}
         for(let i of error.issues) messages[i.path[0]] = i.message
         setInputErrors(messages)
-        alert('Há campos com valores inválidos no formulário. Verifique.') 
+        alert('Há campos com valores inválidos no formulário. Verifique.')
       }
-      else if(erro.status === 400) alert(error.message)
+      else if(error.status === 400) alert(error.message)
       else alert('Usuário ou senha inválidos.')
     }
   }
@@ -58,7 +59,7 @@ export default function LoginPage() {
           <label>
             <span>Usuário:</span><br />
             <input value={username} onChange={e => setUsername(e.target.value)} />
-            <div className='input-error'>
+            <div className="input-error">
               { inputErrors?.username }
             </div>
           </label>
@@ -68,7 +69,7 @@ export default function LoginPage() {
           <label>
             <span>Senha:</span><br />
             <input value={password} type="password" onChange={e => setPassword(e.target.value)} />
-            <div className='input-error'>
+            <div className="input-error">
               { inputErrors?.password }
             </div>
           </label>

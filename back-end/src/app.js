@@ -13,18 +13,15 @@ const app = express();
 
 // Helmet é um pacote que provê várias medidas de segurança,
 // como esconder a tecnologia empregada pelo back-end
-// (cabecalho X-Powered-By)
+// (cabeçalho X-Powered-By)
 import helmet from 'helmet'
 app.use(helmet())
 
 import cors from 'cors'
 app.use(cors({
-  // origin: 'http://localhost:5173',  // URL que terá acesso à API
   origin: process.env.FRONT_END_SERVER.split(','),
-  credentials: true   // Aceita cookies na requisição 
+  credentials: true   // Aceita cookies na requisição
 }))
-
-//console.log("ORIGEM: " + process.env.FRONT_END_SERVER)
 
 app.use(logger("dev"));
 app.use(json());
@@ -38,11 +35,11 @@ app.use("/", indexRouter);
 import auth from './middleware/auth.js'
 app.use(auth)
 
-// MIDLEWARE DE LIMITAÇÃO DE TAXA DE ACESSO
+// MIDDLEWARE DE LIMITAÇÃO DE TAXA DE ACESSO
 
 // Todas as rotas serão afetadas
-import rateLimiter from './middleware/rate-limiter.js'
-app.use(rateLimiter)
+// import rateLimiter from './middleware/rate-limiter.js'
+// app.use(rateLimiter)
 
 /**************************************************
  * ROTAS
