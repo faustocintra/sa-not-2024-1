@@ -39,7 +39,7 @@ export default z.object({
     // Se a senha e a confirmação da senha não forem vazias, ambas devem ter o mesmo valor
     user.password && user.password2 && user.password !== user.password2
 }, {
-    message: 'A confirmação da senha não confere com a senha',
+    message: 'A confirmação da senha não confere commm a senha',
     // A mensagem de erro estará associada ao campo "password2"
     path: ['password2']
 })

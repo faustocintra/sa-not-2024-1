@@ -73,7 +73,7 @@ export default function UserForm() {
 
   return (
     <>
-      <h1>{ params.id ? `Editando usuário #${params.id}` : 'Novo usuário' }</h1>
+      <h1>{ params.id ? `Editando uusuário #${params.id}` : 'Novo usuário' }</h1>
       <form>
 
         <div>
