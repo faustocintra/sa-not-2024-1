@@ -3,9 +3,9 @@ import { z } from 'zod';
 export default function getUserModel(validatePassword = true) {
 
   let rules = z.object({
-
     fullname:
-      z.string().trim()   // Retira espaços em branco do início e do fim
+      z.string()
+        .trim()   // Retira espaços em branco do início e do fim
         .min(5, { message: 'O nome deve ter, no mínimo, 5 caracteres' })
         .max(50, { message: 'O nome deve ter, no máximo, 50 caracteres' })
         .includes(' ', { message: 'O nome deve ter um espaço em branco separando nome e sobrenome' }),
@@ -21,13 +21,11 @@ export default function getUserModel(validatePassword = true) {
 
     login_attempts:
       z.number().nonnegative()
-        .lte(3, { message: 'O número de tentativas deve ser menor ou igual a 3' })
-        .optional(),
+        .lte(3, { message: 'O número de tentativas deve ser menor ou igual a 3' }).optional(),
 
     delay_level:
       z.number().nonnegative()
-        .lte(6, { message: 'O nível de retardo deve ser menor ou igual a 6' })
-        .optional(),
+        .lte(6, { message: 'O nível de retardo deve ser menor ou igual a 6' }).optional(),
 
     last_attempt:
       // coerce força a conversão para o tipo date, se o valor recebido
@@ -43,8 +41,24 @@ export default function getUserModel(validatePassword = true) {
           .min(8, { message: 'A senha deve ter, no mínimo, 8 caracteres' }),
         // Obs.: é possível fazer validações mais complexas usando regex,
         // mas não abordaremos aqui
+
+      password2:
+        z.string({ message: 'Informe a confirmação da senha' })
+
+    }).refine(user => {
+      // Se a senha e a confirmação da senha não forem vazias,
+      // ambas devem ter o mesmo valor
+      if (user.password2) {
+        return user.password === user.password2;
+      } else {
+        return true;
+      }
+    }, { 
+      message: 'A confirmação da senha não confere com a senha',
+      // A mensagem de erro estará associada ao campo "password2"
+      path: ['password2']  
     });
-  }
+  };
 
   return rules;
 }

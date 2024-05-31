@@ -24,6 +24,8 @@ export default function UserList() {
     <>
       <h1>Listagem de usuários</h1>
 
+      <p><Link to="/users/new">[Criar novo usuário]</Link></p>
+
       <table>
         <tr>
           <th>Cód.</th>

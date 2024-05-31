@@ -49,4 +49,4 @@ app.use(auth);
 import userRouter from './routes/user.js';
 app.use('/users', userRouter);
 
-export default app;;
+export default app;
