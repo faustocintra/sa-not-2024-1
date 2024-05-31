@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import AuthUserContext from '../contexts/AuthUserContext';
+import AuthUserContext from '../context/AuthUserContext';
 
 export default function MenuItem( { userLevel = 0, dest, children }) {
   /*

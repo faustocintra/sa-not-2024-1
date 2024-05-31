@@ -3,7 +3,7 @@ import './App.css';
 import { BrowserRouter } from 'react-router-dom';
 import AppHeader from './ui/AppHeader';
 import AppRoutes from './routes/AppRoutes';
-import AuthUserContext from './contexts/AuthUserContext';
+import AuthUserContext from './context/AuthUserContext';
 
 function App() {
 

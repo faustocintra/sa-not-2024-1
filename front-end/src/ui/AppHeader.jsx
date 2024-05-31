@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import AuthUserContext from '../contexts/AuthUserContext';
+import AuthUserContext from '../context/AuthUserContext';
 import myfetch from '../lib/myfetch';
 import MenuItem from '../ui/MenuItem';
 

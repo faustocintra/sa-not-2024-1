@@ -6,7 +6,7 @@ import getUserModel from '../models/User';
 import { ZodError } from 'zod';
 
 export default function UserForm() {
-  
+
   const navigate = useNavigate();
   const params = useParams();
 
@@ -18,7 +18,12 @@ export default function UserForm() {
     inputErrors: null,
     changePassword: false
   });
-  const { user } = state;
+  const {
+    user,
+    inputErrors,
+    changePassword
+  } = state;
+
   const editPasswordRef = React.useRef();
 
   React.useEffect(() => {

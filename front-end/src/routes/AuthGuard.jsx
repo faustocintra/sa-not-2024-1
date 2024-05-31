@@ -1,5 +1,5 @@
 import React from 'react';
-import AuthUserContext from '../contexts/AuthUserContext';
+import AuthUserContext from '../context/AuthUserContext';
 
 export default function AuthGuard({ userLevel=0, children }) {
   /*
