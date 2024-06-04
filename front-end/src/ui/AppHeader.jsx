@@ -2,7 +2,7 @@ import React from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import AuthUserContext from '../contexts/AuthUserContext'
 import myfetch from '../lib/myfetch'
-import MenuItem from './MenuItem'
+import MenuItem from '../ui/MenuItem'
 
 export default function AppHeader() {
   const { authUser, setAuthUser } = React.useContext(AuthUserContext)
@@ -31,9 +31,10 @@ export default function AppHeader() {
   async function handleLogoutClick() {
     if(confirm('Deseja realmente sair?')) {
       try {
-        await myfetch.post('/users/logou')
+        await myfetch.post('/users/logout')
         navigate('/login')
-      } catch(error) {
+      }
+      catch(error) {
         console.error(error)
         alert('ERRO DO SERVIDOR: ' + error.message)
       }

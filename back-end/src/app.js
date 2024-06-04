@@ -41,9 +41,9 @@ app.use(auth)
 // import rateLimiter from './middleware/rate-limiter.js'
 // app.use(rateLimiter)
 
-/***************************************************
+/**************************************************
  * ROTAS
- ***************************************************/
+ **************************************************/
 
 import userRouter from './routes/user.js'
 app.use('/users', userRouter)
