@@ -1,11 +1,11 @@
-import {z} from 'zod'
+import { z } from 'zod'
 
 export default z.object({
-    username:
+  username:
     z.string()
-    .max(20, {message: 'O nome de usuario pode ter no maximo 20 catacter'}),
+    .max(20, { message: 'O nome de usuário pode ter, no máximo, 20 caracteres' }),
 
-    password:
+  password:
     z.string()
-    .max(20, {message: 'A senha pode ter no maximo 200 catacter'}),
+    .max(200, { message: 'A senha pode ter, no máximo, 200 caracteres' })
 })

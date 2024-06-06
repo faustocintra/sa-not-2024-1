@@ -24,17 +24,27 @@ export default function(req, res, next) {
     }
   }
 
-  let token =  null
+  /* PROCESSO DE VERIFICAÇÃO DO TOKEN DE AUTENTICAÇÃO */
+  let token = null
 
+  // 1. Procura o token em um cookie
   token = req.cookies[process.env.AUTH_COOKIE_NAME]
-  console.log({AUTH_COOKIE: token})
+  console.log({ AUTH_COOKIE: token })
+  
+  // 2. Se o cookie contendo o token não existir, procuramos
+  // no cabeçalho de autorização
+  if(! token) {
 
-  if(!token) {
+    // O token pode ter sido enviado no cabeçalho "authorization"
     const authHeader = req.headers['authorization']
-    if (! authHeader) {
-      return res.status(403).end
-    }
+
+    // O token não foi encontrado nem no header ~> HTTP 403: Forbidden
+    if (! authHeader) return res.status(403).end()
+
+    // Divide o cabeçalho em duas partes, separadas por um espaço
     const authHeaderParts = authHeader.split(' ')
+
+    // O token corresponde à segunda parte do cabeçalho
     token = authHeaderParts[1]
   }
 

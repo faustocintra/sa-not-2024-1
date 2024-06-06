@@ -11,6 +11,9 @@ import indexRouter from "./routes/index.js";
 
 const app = express();
 
+// Helmet é um pacote que provê várias medidas de segurança,
+// como esconder a tecnologia empregada pelo back-end
+// (cabeçalho X-Powered-By)
 import helmet from 'helmet'
 app.use(helmet())
 
@@ -32,8 +35,12 @@ app.use("/", indexRouter);
 import auth from './middleware/auth.js'
 app.use(auth)
 
-// import rateLimiter from './middleware/rate-limiter.js';
+// MIDDLEWARE DE LIMITAÇÃO DE TAXA DE ACESSO
+
+// Todas as rotas serão afetadas
+// import rateLimiter from './middleware/rate-limiter.js'
 // app.use(rateLimiter)
+
 /**************************************************
  * ROTAS
  **************************************************/
