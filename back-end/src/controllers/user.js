@@ -10,29 +10,22 @@ const controller = {}   // Objeto vazio
 
 controller.create = async function(req, res) {
   try {
+    const User = getUserModel(true); // Valida com senha
+    User.parse(req.body);
 
-    // O model de validação para o usuário é criado com a validação da senha ativada
-    const User = getUserModel(true)
-    User.parse(req.body)
+    req.body.password = await bcrypt.hash(req.body.password, 12); // Criptografa a senha
 
-    // Criptografando a senha
-    req.body.password = await bcrypt.hash(req.body.password, 12)
+    await prisma.user.create({ data: req.body });
 
-    await prisma.user.create({ data: req.body })
+    res.status(201).end(); // HTTP 201: Created
+  } catch (error) {
+    console.error(error);
 
-    // HTTP 201: Created
-    res.status(201).end()
-  }
-  catch(error) {
-    console.error(error)
-
-    // HTTP 400: Bad Request
-    if(error instanceof ZodError) res.status(400).send(error.issues)
-
-    // HTTP 500: Internal Server Error
-    else res.status(500).end()
+    if (error instanceof ZodError) res.status(400).send(error.issues); // HTTP 400: Bad Request
+    else res.status(500).end(); // HTTP 500: Internal Server Error
   }
 }
+
 
 controller.retrieveAll = async function(req, res) {
   try {
@@ -206,6 +199,8 @@ controller.login = async function(req, res) {
       where: { username: req.body.username.toLowerCase() }
     })
 
+    console.log(user)
+
     // Se o usuário não for encontrado ~>
     // HTTP 401: Unauthorized
     if(! user) return res.status(401).end()
@@ -233,7 +228,7 @@ controller.login = async function(req, res) {
     }
 
     // Usuário encontrado, vamos conferir a senha
-    const passwordMatches = await bcrypt.compare(req.body.password, user.password)
+    const passwordMatches = bcrypt.compare(req.body.password, user.password)
 
     // Se a senha estiver incorreta
     if(! passwordMatches) {
@@ -262,6 +257,8 @@ controller.login = async function(req, res) {
       // HTTP 401: Unauthorized
       return res.status(401).end()
     }
+
+    console.log("cheguei aqui")
 
     // Se chegamos até aqui, username + password estão OK
     // Resetamos o número de tentativas e o nível de espera
