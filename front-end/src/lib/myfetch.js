@@ -7,6 +7,10 @@
  * @license GL2PS
  */
 
+/* 
+  Vulnerabilidade: API10:2023 – Consumo inseguro de APIs
+  Foi evitada verificando e processando respostas e requisições da API de forma segura, utilizando códigos de status HTTP e lançando erros quando necessário.
+*/
 class HttpError extends Error {
   constructor(status, message) {
     super(message)

@@ -49,6 +49,10 @@ export default function(req, res, next) {
   }
 
   // VERIFICAÇÃO E VALIDAÇÃO DO TOKEN
+  /*
+    Vulnerabilidade: API2:2023 – Falha de autenticação
+    Foi evitada ao verificar a validade do token e retornar erro em caso de falha.
+  */
   jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
 
     /* 

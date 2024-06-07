@@ -1,6 +1,11 @@
 import React from 'react'
 import AuthUserContext from '../contexts/AuthUserContext'
 
+/*
+  Vulnerabilidade: API5:2023 – Falha de autenticação a nível de função
+  Foi evitada ao implementar um AuthGuard,
+  que verifica se o usuário tem o nível de acesso necessário para ter o acesso aos recursos protegidos.
+*/
 export default function AuthGuard({ userLevel = 0, children}) {
   /*
     userLevel:
