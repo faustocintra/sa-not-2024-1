@@ -9,7 +9,21 @@ import logger from "morgan";
 import indexRouter from "./routes/index.js";
 //import usersRouter from "./routes/users.js";
 
+/*
+  API9:2023   –   Gerenciamento   inapropriado   do   inventário.
+  Esta vulnerabilidade deveria ter sido evitada no código fazendo
+  uma documentação via swagger da API e mantendo ela atualizada,
+  evitando assim expor endpoints obsoletos
+*/
+
 const app = express();
+
+/*
+  API8:2023 – Má configuração de segurança
+  Esta vulnerabilidade foi evitado no código ao usa o 
+  middleware Helmet para configurar cabeçalhos de segurança HTTP, 
+  mitigando má configuração de segurança.
+*/
 
 // Helmet é um pacote que provê várias medidas de segurança,
 // como esconder a tecnologia empregada pelo back-end

@@ -1,5 +1,11 @@
 import jwt from "jsonwebtoken";
 
+/* API1:2023 – Falha de autenticação a nível de objeto.
+  Esta vulnerabilidade foi evitado no código ao fazer 
+  verificação se o token JWT está presente e válido. 
+  Se estiver, adiciona os dados do usuário (req.authUser) à requisição.
+*/
+
 export default function (req, res, next) {
   /*
     Algumas rotas, como /users/login, devem poder ser acessadas

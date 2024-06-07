@@ -10,6 +10,16 @@ const controller = {}; // Objeto vazio
 
 controller.create = async function (req, res) {
   try {
+    /*
+    API2:2023 – Falha de autenticação
+    Esta vulnerabilidade foi evitado no código ao
+    realizar registro de novos novos usuários,
+    armazenando a senha de forma segura usando bcrypt.
+
+    Apesar de não verificar se o usuário já existe
+    diretamente no codigo, o prisma faz essa verificação.
+    Evitando assim a sobreposição de dados.
+  */
     // O model de validação para o usuário é criado com a validação da senha ativada
     const User = getUserModel(true);
     User.parse(req.body);
@@ -37,6 +47,12 @@ controller.retrieveAll = async function (req, res) {
     // Somente usuários do nível administrador podem ter acesso à listagem de todos
     // os usuários
     // Caso contrário, retorna HTTP 403: Forbidden
+
+    /*
+    API5:2023 – Falha de autenticação a nível de função.
+    Esta vulnerabilidade foi evitado no código ao fazer
+    a validação se o usuario é admin para acessar essa feature.
+    */
     if (!req?.authUser?.is_admin) return res.status(403).end();
 
     const result = await prisma.user.findMany();
@@ -190,6 +206,13 @@ function getUserLoginParams(user) {
 }
 
 controller.login = async function (req, res) {
+  /*
+  API2:2023 – Falha de autenticação
+  Esta vulnerabilidade foi evitado no código quando
+  usuários existentes façam login verificando a
+  combinação de nome de usuário e senha,
+  e gerando um token JWT para autenticação.
+  */
   try {
     // Invoca a validação dos campos definida no model Login
     Login.parse(req.body);
