@@ -24,6 +24,15 @@ export default function(req, res, next) {
     }
   }
 
+  /* 
+    API2:2023 – Falha de autenticação
+    Esta vulnerabilidade foi evitada no código ao fazer com que seja realizada uma 
+    autenticação utilizando um token criado anteriormente e presente em um cookie, 
+    ou no cabeçalho da requisição. Caso o token não esteja em nenhum dos dois pode ser
+    retornado o erro HTTP 403: Forbidden, ou seja, apenas se o token existir, 
+    não tiver expirado e for valido, as informações do usuário serão guardadas para 
+    serem utilizadas futuramente.
+  */
   /* PROCESSO DE VERIFICAÇÃO DO TOKEN DE AUTENTICAÇÃO */
   let token = null
 

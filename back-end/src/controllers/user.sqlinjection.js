@@ -119,8 +119,20 @@ controller.delete = async function(req, res) {
 }
 
 controller.login = async function(req, res) {
- 
-  // ATENÇÃO: a consulta abaixo pode facilitar um ataque de SQL Injection
+  
+   /* 
+    API7:2023 – Falsificação de requisição do lado do servidor.
+    Esta vulnerabilidade foi evitada no código ao passar a consulta 
+    const query = `select * from user where username = ?;` ao inves de 
+    const query = `select * from user where username = '${req.body.username}';`
+    pois ao indicar o ponto de interrogação, este indica um espaço reservado 
+    para um parametro que sera fornecido da seguinte forma
+    const user = await db.get(query, [req.body.username])
+    posteriormente de forma segura. Ao inves de uma 
+    interpolação direta como em  '${req.body.username}';
+    */
+
+    // ATENÇÃO: a consulta abaixo pode facilitar um ataque de SQL Injection
   //const query = `select * from user where username = '${req.body.username}';`
 
   const query = `select * from user where username = ?;`
@@ -159,6 +171,12 @@ controller.login = async function(req, res) {
 
     // Se chegamos até aqui, username + password estão OK
     // Vamos criar o token e retorná-lo como resposta
+
+     /* 
+    API2:2023 – Falha de autenticação
+    Esta vulnerabilidade foi evitada no código ao excluir a senha e criar
+    um token que sera retornado como resposta.
+    */
 
     // O token inclui as informações do usuário. Vamos excluir o campo
     // da senha antes de prosseguir

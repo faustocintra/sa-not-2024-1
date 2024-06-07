@@ -37,10 +37,12 @@ controller.create = async function(req, res) {
 controller.retrieveAll = async function(req, res) {
   try {
 
-    // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
-    // Somente usuários do nível administrador podem ter acesso à listagem de todos
-    // os usuários
-    // Caso contrário, retorna HTTP 403: Forbidden
+    /* 
+    Vulnerabilidade: API1:2023 – Falha de autenticação a nível de objeto 
+    Esta vulnerabilidade foi evitada no código ao fazer com que apenas usuários 
+    com nível de administrador possam ter acesso a listagem de todos os usuários
+    */
+    
     if(! req?.authUser?.is_admin) return res.status(403).end()
 
     const result = await prisma.user.findMany()
@@ -86,8 +88,14 @@ controller.retrieveOne = async function(req, res) {
 controller.update = async function(req, res) {
   try {
 
-    // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
-    // Usuário que não seja administrador somente pode alterar o próprio cadastro
+    /* 
+    Vulnerabilidade: API1:2023 – Falha de autenticação a nível de objeto 
+    Esta vulnerabilidade foi evitada no código ao fazer com que usuários 
+    sem nível de administrador possam alterar apenas o proprio cadastro,
+    isso pois estes não terão como acessar outros cadastros, sendo assim, 
+    não terão acesso a dados de outras pessoas
+    */
+    
     if((! req?.authUser?.is_admin) && Number(req?.authUser?.id) !== Number(req.params.id)) {
       // HTTP 403: Forbidden
       res.status(403).end()
@@ -314,7 +322,13 @@ controller.login = async function(req, res) {
 }
 
 controller.logout = function(req, res) {
-  // Apaga o cookie que armazena o token de autorização
+  /* 
+    API2:2023 – Falha de autenticação
+    Esta vulnerabilidade foi evitada no código ao fazer com que o token criado
+    ao fazer login, não seja armazenado por cookies, evitando que este fique exposto
+    a hackers
+    */
+  // Apaga o cookie que armazena o token de autorização 
   res.clearCookie(process.env.AUTH_COOKIE_NAME)
   res.status(204).end()
 }

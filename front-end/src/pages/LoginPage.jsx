@@ -24,6 +24,11 @@ export default function LoginPage() {
       //const result = await myfetch.post('/users/login', { username, password })
       await myfetch.post('/users/login', { username, password })
 
+      /* 
+    API2:2023 – Falha de autenticação
+    Esta vulnerabilidade poderia ser evitada mais facilmente caso não fosse armazenada no localStorage
+    da aplicação, deveria ser armazenada corretamente em um banco de dados.
+  */
       // Armazena o token recebido no localStorage
       // ATENÇÃO: ABORDAGEM NÃO SEGURA, há outros meios
       // mais adequados de armazenar o token com segurança

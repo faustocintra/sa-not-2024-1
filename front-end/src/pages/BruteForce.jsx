@@ -56,3 +56,11 @@ export default function BruteForce() {
     </>
   )
 }
+
+  /* 
+    API8:2023 – Má configuração de segurança
+    Esta página em si e suas validações de segurança contra ataques de força bruta,
+    realizados passando uma lista de palavras comuns para verificação deste tipo de ataque, 
+    ajudam a fortalecer a segurança da aplicação e impedir que hackers consigam acessar o sistema
+    por esse meio e obter informações sigilosas.
+  */
