@@ -10,7 +10,13 @@ const controller = {}   // Objeto vazio
 
 controller.create = async function(req, res) {
   try {
-
+    /*API1:2023 – Falha de autenticação a nível de objeto.
+      Não valida se o usuário tem a devida permissão para acessar este recurso
+      O usuário pode criar um novo usuário apenas com permissões de administrador
+      deveria ser incluso algo como
+      if(!req.user.is_admin) return res.status(403).end();
+      para evitar que um usuário comum ou não autenticado use este recurso
+    */
     // O model de validação para o usuário é criado com a validação da senha ativada
     const User = getUserModel(true)
     User.parse(req.body)
