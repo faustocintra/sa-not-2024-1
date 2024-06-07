@@ -37,6 +37,7 @@ export default function UserList() {
         </tr>
         {
           users.map(u => (
+            // eslint-disable-next-line react/jsx-key
             <tr>
               <td>{u.id}</td>
               <td>{u.fullname}</td>
