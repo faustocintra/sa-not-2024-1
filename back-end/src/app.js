@@ -1,3 +1,10 @@
+/**
+ * API9:2023 – Gerenciamento inapropriado do inventário.
+ * Vulnerabilidade poderia ser evitado no projeto adicionando uma documentação onde contenha informação de versões da api e, sobre rotas.
+ * Poderia ter cido utilizada a documentação do swagger para este controle, assim mitigando o uso de rotas ou versões desatualizadas.
+ */
+
+
 // Importa as variáveis de ambiente do arquivo .env
 import dotenv from 'dotenv'
 dotenv.config()

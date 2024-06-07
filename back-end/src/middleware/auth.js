@@ -1,5 +1,11 @@
 import jwt from 'jsonwebtoken'
 
+/**
+ * API7:2023 – Falsificação de requisição do   lado   do   servidor.
+ * O erro foi corrigido na verificação do token em rotas que não são publicas, em rotas que necessitam de um token para tem acesso.
+ * O codigo pega o token que esta presente no cookie do navegador, e faz a verificação com a lib jwt, caso o exista o token e for valido o usuario acessa a rota, caso não exibe o status 403, não autorizado.
+ */
+
 export default function (req, res, next) {
 
   /*
