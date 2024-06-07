@@ -3,10 +3,9 @@ import './App.css'
 import { BrowserRouter } from 'react-router-dom'
 import AppHeader from './ui/AppHeader'
 import AppRoutes from './routes/AppRoutes'
-import AuthUserContext from './context/AuthUserContext'
+import AuthUserContext from './contexts/AuthUserContext'
 
 function App() {
-
   const [authUser, setAuthUser] = React.useState(null)
 
   return (

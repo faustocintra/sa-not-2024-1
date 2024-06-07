@@ -1,5 +1,5 @@
 import React from 'react'
-import wordlist from '../data/wordList'
+import wordlist from '../data/wordlist'
 import myfetch from '../lib/myfetch'
 
 let stop = false
@@ -25,12 +25,13 @@ export default function BruteForce() {
       let result = await tryPassword(wordlist[i])
       if(result === 'OK') {
         setLog(`SENHA ENCONTRADA, tentativa nº ${i}: ${wordlist[i]}` )
+        stop = true
         break
       }
       else {
         setLog(`Tentativa nº ${i} (${wordlist[i]}) => ${result}`)
       }
-      setTimeout(() => setLog('___parado___'), 250)
+      setTimeout(() => setLog('-- parado --'), 250)
     }
     event.target.disabled = false
   }
