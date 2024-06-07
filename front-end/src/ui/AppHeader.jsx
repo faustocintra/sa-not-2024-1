@@ -54,11 +54,15 @@ export default function AppHeader() {
       </li>
     )
   }
-
+  /*
+  Vulnerabilidade: API3:2023 - Falha de autenticação a nível de propriedade  
+  Define o nível de acesso de cada MenuItem, evitando que usuários comuns acessem recursos restritos.
+  */
   return (
     <>
       <h1>Segurança no Desenvolvimento de Aplicações</h1>
       <hr />
+      /*
       <ol style={{ listStyleType: 'none', display: 'flex' }}>
         <MenuItem dest="/">Página inicial</MenuItem>
         <MenuItem userLevel={2} dest="/users">Usuários</MenuItem>

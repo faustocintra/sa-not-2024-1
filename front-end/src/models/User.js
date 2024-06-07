@@ -4,6 +4,10 @@ export default function getUserModel(validatePassword = true) {
 
   let rules = z.object({
 
+    /*
+    Vulnerabilidade: API4:2023 - Consumo irrestrito de recursos
+    Define o tamanho máximo do nome completo, nome de usuário e senha, e regras de tentativa de acesso, evitando ataques de negação de serviço (DoS).
+    */
     fullname:
       z.string()
       .trim()   // Retira espaços em branco do início e do fim

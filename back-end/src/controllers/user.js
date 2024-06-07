@@ -146,6 +146,7 @@ controller.delete = async function(req, res) {
   o login do usuário em função do número de tentativas e do tempo de 
   atraso após o esgotamento do número de tentativas permitidas
 */
+
 function getUserLoginParams(user) {
   // Recuperamos os níveis de atraso da variável de ambiente
   const delayLevels = process.env.DELAY_LEVELS.split(',')
@@ -212,6 +213,12 @@ controller.login = async function(req, res) {
 
     // Busca os parâmetros que serão usados na validação de tentativas
     // e intervalo de login
+
+    /*
+    Vulnerabilidade: API4:2023 - Consumo irrestrito de recursos
+    A função getUserLoginParams valida o número de tentativas e tempo de atraso de login, para evitar o ataque de negação de serviço.
+    */
+   
     const {
       nextDelayLevel,
       currentDelayMinutes,
@@ -219,6 +226,7 @@ controller.login = async function(req, res) {
       currentLoginAttempts,
       nextLoginAttempts
     } = getUserLoginParams(user)
+    
 
     console.log(`Tentativas: ${currentLoginAttempts}, pode tentar após ${format(canLoginAfter, "PPpp")}`)
 
@@ -285,6 +293,12 @@ controller.login = async function(req, res) {
       process.env.TOKEN_SECRET,   // Senha de criptografia do token
       { expiresIn: '24h' }  // Prazo de validade do token
     )
+
+    /*
+    Vulnerabilidade: API2:2023 - Falha de autenticação
+    O token é criado para garantir a autenticação do usuário.
+    Ele não é enviado na resposta da requisição, mas sim armazenado em um cookie evitando que atacantes possam assumir identidades de outros usuários.
+    */
 
     // Formamos o cookie para enviar ao front-end
     res.cookie(process.env.AUTH_COOKIE_NAME, token, {

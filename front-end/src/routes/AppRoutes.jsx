@@ -9,6 +9,16 @@ import UserList from '../pages/UserList'
 import UserForm from '../pages/UserForm'
 import BruteForce from '../pages/BruteForce'
 
+/* 
+  Vulnerabilidade: API3:2023 - Falha de autenticação a nível de propriedade  
+  Define as totas que serão protegidas pelo AuthGuard, colocando níveis de usuário, evitando que usuários comuns acessem recursos restritos.
+*/
+
+/*
+ Vulnerabilidade: API5:2023 - Falha de autenticação a nível de função
+ Ao definir rota de funções administratitivas protegidas, é esperado que se evite ataques de usuários comuns a recursos restritos.
+*/
+
 // Rotas protegidas por AuthGuard
 const guardedUserList = (
   <AuthGuard userLevel={2}>

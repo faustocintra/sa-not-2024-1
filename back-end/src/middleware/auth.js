@@ -24,6 +24,12 @@ export default function(req, res, next) {
     }
   }
 
+  /*
+  Vulnerabilidade: API2:2023 - Falha de autenticação
+  O processo de verificação do token de autenticação evita que usuários não autenticados acessem rotas que necessitam de autenticação.
+  O usuário recebe um token de autenticação ao fazer login, esse token deve ser enviado em todas as requisições que necessitem de autenticação. É feita a verificação do token pelo Middleware, se o token for inválido ou expirado, o usuário não autenticado não terá acesso à rota protegida.
+  */
+
   /* PROCESSO DE VERIFICAÇÃO DO TOKEN DE AUTENTICAÇÃO */
   let token = null
 
