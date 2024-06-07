@@ -46,29 +46,13 @@ export default function getUserModel(validatePassword = true) {
 
   // Acrescenta regras adicionais caso a senha necessite ser validada
   if (validatePassword) {
-    rules = rules
-      .extend({
-        password: z
-          .string({ message: "Informe a senha" })
-          .min(8, { message: "A senha deve ter, no mínimo, 8 caracteres" }),
-        // Obs.: é possível fazer validações mais complexas usando regex,
-        // mas não abordaremos aqui
-
-        password2: z.string({ message: "Informe a confirmação da senha" }),
-      })
-      .refine(
-        (user) => {
-          // Se a senha e a confirmação da senha não forem vazias,
-          // ambas devem ter o mesmo valor
-          if (user.password2) return user.password === user.password2;
-          else return true;
-        },
-        {
-          message: "A confirmação da senha não confere com a senha",
-          // A mensagem de erro estará associada ao campo "password2"
-          path: ["password2"],
-        }
-      );
+    rules = rules.extend({
+      password: z
+        .string({ message: "Informe a senha" })
+        .min(8, { message: "A senha deve ter, no mínimo, 8 caracteres" }),
+      // Obs.: é possível fazer validações mais complexas usando regex,
+      // mas não abordaremos aqui
+    });
   }
 
   return rules;

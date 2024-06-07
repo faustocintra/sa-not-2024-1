@@ -1,6 +1,7 @@
+import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
-import AuthGuard from './AuthGuard';
+import AuthGuard from './AuthGuard'
 
 import HomePage from '../pages/HomePage'
 import LoginPage from '../pages/LoginPage'
@@ -24,12 +25,13 @@ const guardedBruteForce = (
     <BruteForce />
   </AuthGuard>
 )
+
 export default function AppRoutes() {
   return <Routes>
     <Route path="/" element={ <HomePage /> } />
     <Route path="/login" element={ <LoginPage /> } />
     <Route path="/users" element={ guardedUserList } />
-    <Route path="/users/:id" element={ <UserForm /> } />
+    <Route path="/users/new" element={ guardedUserForm } />
     <Route path="/users/:id" element={ guardedUserForm } />
     <Route path="/brute-force" element={ guardedBruteForce } /> 
   </Routes>
