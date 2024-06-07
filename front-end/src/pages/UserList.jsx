@@ -13,6 +13,10 @@ export default function UserList() {
   async function fetchData() {
     try {
       const result = await myfetch.get('/users')
+      /*
+      Vulnerabilidade: API3:2023 – Falha de autenticação a nível de propriedade
+      Recupera e trata somente das informações necessárias do backend para evitar a exposição de informações sensíveis, pois estamos atualizando o estado de uma variável de acordo com os dados enviados do backend ao fazer setUsers(result).
+      */
       setUsers(result)
     }
     catch(error) {

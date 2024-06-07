@@ -23,6 +23,10 @@ const baseUrl = import.meta.env.VITE_API_BASE
 function getOptions(body = null, method = 'GET') {
   const options = {
     method,
+    /* 
+    Vulnerabilidade: API8:2023 – Má configuração de segurança
+    Garante que as requisições incluam credenciais e headers próprias para evitar erros por má configuração tanto com a a configuração feita no headers quanto o credential: include
+    */
     headers: {"Content-type": "application/json; charset=UTF-8"},
     credentials: 'include'
   }

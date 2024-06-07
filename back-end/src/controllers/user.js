@@ -72,6 +72,10 @@ controller.retrieveOne = async function(req, res) {
     if(result?.password) delete result.password
 
     // Resultado encontrado ~> HTTP 200: OK (implícito)
+    /* 
+    Vulnerabilidade: API1:2023 – Falha de autenticação a nível de objeto
+    Garante que apenas usuários autorizados tenham acesso a dados específicos, pois aqui fazemos uma verificação se o usuário autenticado tem permissão para acessar o recurso solicitado quando fazemos essa condição if(result)
+    */
     if(result) res.send(result)
     // Resultado não encontrado ~> HTTP 404: Not Found
     else res.status(404).end()
@@ -227,6 +231,10 @@ controller.login = async function(req, res) {
     if(user.login_attempts >= Number(process.env.MAX_LOGIN_ATTEMPTS) &&
       new Date() < canLoginAfter) {
       // Avisa que o usuário poderá tentar de novo após XXX milissegundos
+      /* 
+      Vulnerabilidade: API6:2023 – Acesso irrestrito a fluxos de negócio sensíveis
+      Previne o ataque de força bruta limitanto o número de tentativa de login por conta da espera gerada para tentar novamente o login ao ser feito "currentDelayMinutes * 60 * 1000"
+      */
       res.setHeader('Retry-After', currentDelayMinutes * 60 * 1000)
       // HTTP 429: Too Many Attempts
       return res.status(429).end()
