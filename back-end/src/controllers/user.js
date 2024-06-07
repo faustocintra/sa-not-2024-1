@@ -86,6 +86,16 @@ controller.retrieveOne = async function(req, res) {
 controller.update = async function(req, res) {
   try {
 
+    /**
+     * Vunerabilidade: API1:2023: Falha de autenticação a nível de objeto
+     * Esta vunerabilidade foi evitado no codigo a baixo fazendo que somente o usúario 
+     * possa modificar o prorio cadastro, no caso ele esta evitando que outras 
+     * pessoas tenham controle de acesso ao seu cadastro, no codigo ele cria esta codição
+     * e depois valida usando o password e por fim criptografa para mandar para o banco
+     * de dados.
+     * 
+     */
+
     // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
     // Usuário que não seja administrador somente pode alterar o próprio cadastro
     if((! req?.authUser?.is_admin) && Number(req?.authUser?.id) !== Number(req.params.id)) {
@@ -141,10 +151,19 @@ controller.delete = async function(req, res) {
   }
 }
 
+
+/**
+ * Vunerabilidade : API2:2023 – Falha de autenticação
+ * Esta vulnerabilidade foi evitado no código a baixo ao determinar parâmetros para validar
+ * login por números de tentativas e tempo de atraso, no caso ele esta evitando, ataques
+ * por força bruta.
+ */
+
 /*
   Função que obtém ou determina os parâmetros necessários para validar
   o login do usuário em função do número de tentativas e do tempo de 
-  atraso após o esgotamento do número de tentativas permitidas
+  atraso após o esgotamento do número de tentativas permitidas.
+
 */
 function getUserLoginParams(user) {
   // Recuperamos os níveis de atraso da variável de ambiente

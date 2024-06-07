@@ -136,6 +136,14 @@ controller.login = async function(req, res) {
     // SQL Injection
     //const user = await db.get(query)
 
+    /**
+     * Vulnerabilidade: API7:2023   –   Falsificação   de   requisição   do   lado   do   servidor.
+     * Esta vunerabilidade foi evitado no codigo a baixo ao fazer um consulta para evitar SQL injection que 
+     * no caso e o ataque por meio de comandos Sql no codigo ele faz consultas e confirma
+     * se e encontrado um usuario, e faz a conferencia de senha e depois a criação de um token como 
+     * resposta.
+     */
+
     // Executando a consulta com parâmetro para prevenir SQL Injection
     const user = await db.get(query, [req.body.username])
     console.log(user)
