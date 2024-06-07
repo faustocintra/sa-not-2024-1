@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import AuthUserContext from '../contexts/AuthUserContext'
 
+// eslint-disable-next-line react/prop-types
 export default function MenuItem( { userLevel = 0, dest, children }) {
   /*
     userLevel:

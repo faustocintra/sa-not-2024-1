@@ -26,7 +26,7 @@ export default function AppHeader() {
         // navigate('/login')
       }
     })()
-  }, [location])
+  }, [location, setAuthUser])
 
   async function handleLogoutClick() {
     if(confirm('Deseja realmente sair?')) {
