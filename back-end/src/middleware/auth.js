@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 
-export default function (req, res, next) {
+export default function(req, res, next) {
 
   /*
     Algumas rotas, como /users/login, devem poder ser acessadas
@@ -17,24 +17,42 @@ export default function (req, res, next) {
     esteja, passa para o próximo middleware (next()) sem verificar
     o token.
   */
-  for (let route of bypassRoutes) {
-    if (route.url === req.url && route.method === req.method) {
+  for(let route of bypassRoutes) {
+    if(route.url === req.url && route.method === req.method) {
       next()
       return
     }
   }
+// API2:2023 – Falha de autenticação
+// Essa vulnerabilidade foi evitada utilizando a biblioteca jsonwebtoken, que 
+// transmite e armazena de forma segura os objetos JSON entre diferentes aplicações
+// e fazendo o processo de verificação do token de maneira correta no código a seguir
+// impedindo que atacantes comprometam tokens de autenticação
 
-  //verificação
+  /* PROCESSO DE VERIFICAÇÃO DO TOKEN DE AUTENTICAÇÃO */
   let token = null
+
+  // 1. Procura o token em um cookie
   token = req.cookies[process.env.AUTH_COOKIE_NAME]
   console.log({ AUTH_COOKIE: token })
+  
+  // 2. Se o cookie contendo o token não existir, procuramos
+  // no cabeçalho de autorização
+  if(! token) {
 
-  if (!token) {
-    const authHeader = req.headers["authorization"]
-    if (!authHeader) return req.status(403).end()
-    const authHeadersPath = authHeader.split(' ')
-    token = authHeadersParts[1]
+    // O token pode ter sido enviado no cabeçalho "authorization"
+    const authHeader = req.headers['authorization']
+
+    // O token não foi encontrado nem no header ~> HTTP 403: Forbidden
+    if (! authHeader) return res.status(403).end()
+
+    // Divide o cabeçalho em duas partes, separadas por um espaço
+    const authHeaderParts = authHeader.split(' ')
+
+    // O token corresponde à segunda parte do cabeçalho
+    token = authHeaderParts[1]
   }
+
   // VERIFICAÇÃO E VALIDAÇÃO DO TOKEN
   jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
 
@@ -42,7 +60,7 @@ export default function (req, res, next) {
       Se há erro, significa que o token é inválido ou está expirado
       HTTP 403: Forbidden
     */
-    if (error) return res.status(403).end()
+    if(error) return res.status(403).end()
 
     /*
       Se chegamos até aqui, o token está OK e temos as informações

@@ -2,26 +2,40 @@ import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import myfetch from '../lib/myfetch'
 import './UserForm.css'
-import User from '../models/User'
+import getUserModel from '../models/User'
 import { ZodError } from 'zod'
 
 export default function UserForm() {
+  const navigate = useNavigate()
+  const params = useParams()
+
   const [state, setState] = React.useState({
-    user: {},
-    inputErrors: null
+    user: {
+      // Valor inicial para não dar erro de validação
+      is_admin: false
+    },
+    inputErrors: null,
+    changePassword: false
   })
   const {
     user,
-    inputErrors
+    inputErrors,
+    changePassword
   } = state
 
   const editPasswordRef = React.useRef()
 
-  const navigate = useNavigate()
-  const params = useParams()
-
   React.useEffect(() => {
+
     if(params.id) fetchData()
+    
+    // Se estivermos no modo de inserção de um
+    // novo usuário (ou seja, sem id na rota),
+    // os campos de senha deverão sempre ser mostrados
+    else {
+      editPasswordRef.current.style.display = 'block'
+      setState({ ...state, changePassword: true })
+    }
   }, [])
 
   async function fetchData() {
@@ -43,9 +57,8 @@ export default function UserForm() {
   function handleEditPasswordToggle(e) {
     if(e.target.checked) editPasswordRef.current.style.display = 'block'
     else editPasswordRef.current.style.display = 'none'
-    const userCopy = { ...user }
-    userCopy.changePassword = e.target.checked
-    setState({ ...state, user: userCopy })
+
+    setState({ ...state, changePassword: e.target.checked })
   }
 
   function handleIsAdminClick(e) {
@@ -58,7 +71,11 @@ export default function UserForm() {
     event.preventDefault()    // Impede o recarregamento da página
     try {
       // Invoca a validação do Zod por meio do model User
+      const User = getUserModel(changePassword)
       User.parse(user)
+
+      // Exclui o campo password2
+      if('password2' in user) delete user.password2
 
       // Se a rota tiver o parâmetro id, significa que estamos editando
       // um usuário
@@ -68,6 +85,9 @@ export default function UserForm() {
       else await myfetch.post('/users', user)
 
       alert('Dados salvos com sucesso.')
+
+      // Volta para a página de listagem de usuários
+      navigate('/users', { replace: true })
     }
     catch(error) {
       console.error(error)
@@ -110,7 +130,7 @@ export default function UserForm() {
           </label>
         </div>
 
-        <div>
+        <div style={{ display: params.id ? 'block' : 'none' }}>
           <input type="checkbox" onClick={handleEditPasswordToggle} />
           &nbsp;<span>Alterar senha</span>
         </div>
@@ -143,6 +163,7 @@ export default function UserForm() {
         </div>
 
       </form>
+      
     </>
   )
 }

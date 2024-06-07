@@ -12,7 +12,7 @@ router.put('/:id', controller.update)
 router.delete('/:id', controller.delete)
 router.post('/logout', controller.logout)
 
-//Rota de login será limitada pelo rateLimiter
+// Número de logins será limitado pelo rateLimiter
 router.post('/login', rateLimiter, controller.login)
 
 export default router

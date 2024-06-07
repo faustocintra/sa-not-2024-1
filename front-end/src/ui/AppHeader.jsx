@@ -36,7 +36,7 @@ export default function AppHeader() {
       }
       catch(error) {
         console.error(error)
-        alert('ERRO DO SERVIDOR: ', error.message)
+        alert('ERRO DO SERVIDOR: ' + error.message)
       }
     }
   }

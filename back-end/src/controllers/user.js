@@ -2,13 +2,18 @@ import prisma from '../database/client.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { format, addMinutes } from 'date-fns'
+import { ZodError } from 'zod'
 import Login from '../models/Login.js'
-import  z from 'zod'
+import getUserModel from '../models/User.js'
 
 const controller = {}   // Objeto vazio
 
 controller.create = async function(req, res) {
   try {
+
+    // O model de validação para o usuário é criado com a validação da senha ativada
+    const User = getUserModel(true)
+    User.parse(req.body)
 
     // Criptografando a senha
     req.body.password = await bcrypt.hash(req.body.password, 12)
@@ -20,8 +25,12 @@ controller.create = async function(req, res) {
   }
   catch(error) {
     console.error(error)
+
+    // HTTP 400: Bad Request
+    if(error instanceof ZodError) res.status(400).send(error.issues)
+
     // HTTP 500: Internal Server Error
-    res.status(500).end()
+    else res.status(500).end()
   }
 }
 
@@ -84,6 +93,11 @@ controller.update = async function(req, res) {
       res.status(403).end()
     }
 
+    // O model para a validação do usuário será criado com validação de senha
+    // se o campo 'password' tiver sido passado no req.body
+    const User = getUserModel('password' in req.body)
+    User.parse(req.body)
+
     // Se tiver sido passado o campo 'password' no body
     // da requisição, precisamos criptografá-lo antes de
     // enviar ao banco de dados
@@ -101,8 +115,12 @@ controller.update = async function(req, res) {
   }
   catch(error) {
     console.error(error)
+
+    // HTTP 400: Bad Request
+    if(error instanceof ZodError) res.status(400).send(error.issues)
+    
     // HTTP 500: Internal Server Error
-    res.status(500).end()
+    else res.status(500).end()
   }
 }
 
@@ -180,7 +198,9 @@ function getUserLoginParams(user) {
 controller.login = async function(req, res) {
   try {
 
+    // Invoca a validação dos campos definida no model Login
     Login.parse(req.body)
+
     // Busca o usuário pelo username
     const user = await prisma.user.findUnique({
       where: { username: req.body.username.toLowerCase() }
@@ -204,7 +224,7 @@ controller.login = async function(req, res) {
 
     // Usuário encontrado, precisamos verificar se ele ainda tem
     // tentativas de login disponíveis ou se o tempo de atraso já expirou
-    if(user.login_attempts > Number(process.env.MAX_LOGIN_ATTEMPTS) &&
+    if(user.login_attempts >= Number(process.env.MAX_LOGIN_ATTEMPTS) &&
       new Date() < canLoginAfter) {
       // Avisa que o usuário poderá tentar de novo após XXX milissegundos
       res.setHeader('Retry-After', currentDelayMinutes * 60 * 1000)
@@ -266,25 +286,35 @@ controller.login = async function(req, res) {
       { expiresIn: '24h' }  // Prazo de validade do token
     )
 
+    // Formamos o cookie para enviar ao front-end
     res.cookie(process.env.AUTH_COOKIE_NAME, token, {
-      httpOnly: true,
+      httpOnly: true,   // O cookie ficará inacessível para JS
       secure: true,
       sameSite: 'Strict',
       path: '/',
-      maxAge: 24 * 60 * 60 * 1000
+      maxAge: 24 * 60 * 60 * 1000   // 24h em milissegundos
     })
 
     // Retorna o token com status HTTP 200: OK (implícito)
-    res.send({token})
+    //res.send({token})
+
+    // O token não é mais enviado na resposta
+    // A resposta agora é simplesmente HTTP 204: No Content
+    res.status(204).end()
 
   }
   catch(error) {
-    if (error instanceof z.zodError) res.status(400).send(error.issues)
+    console.error(error)
+    // HTTP 400: Bad Request
+    if (error instanceof ZodError) res.status(400).send(error.issues)
+    
+    // HTTP 500: Internal Server Error
     else res.status(500).send(error)
   }
 }
 
-controller.logout = function(req, res){
+controller.logout = function(req, res) {
+  // Apaga o cookie que armazena o token de autorização
   res.clearCookie(process.env.AUTH_COOKIE_NAME)
   res.status(204).end()
 }
