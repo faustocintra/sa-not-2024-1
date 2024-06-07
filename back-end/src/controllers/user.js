@@ -146,6 +146,15 @@ controller.delete = async function(req, res) {
   atraso após o esgotamento do número de tentativas permitidas
 */
 function getUserLoginParams(user) {
+  /*
+    Vulnerabilidade - API2:2023 – Falha de autenticação
+
+    Essa vulnerabilidade foi evitado aqui, pois verifica a quantidade de tentativas
+    de acesso desse usuário, definindo um delay de tempo para a próxima vezes que poderá
+    tentar realizar o login novamente. É feito para evitar, por exemplo, ataques de força
+    bruta acessarem outros usuários sem permissão ou deixar os atacantes realizarem, sem
+    restrição, tentativas de adivinharem a senha.
+  */
   // Recuperamos os níveis de atraso da variável de ambiente
   const delayLevels = process.env.DELAY_LEVELS.split(',');
 
