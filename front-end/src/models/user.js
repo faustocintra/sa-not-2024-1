@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-export default z
-  .object({
+export default function getUserModel(validatePassword = true) {
+  let rules = z.object({
     fullname: z
       .string()
       .trim() // Retira espaços em branco do início e do fim
@@ -24,12 +24,6 @@ export default z
         message: "O nome do usuário deve ter, no máximo, 20 caracteres",
       }),
 
-    // password:
-    //   z.string()
-    //   .min(8, { message: 'A senha deve ter, no mínimo, 8 caracteres' }),
-    //   // Obs.: é possível fazer validações mais complexas usando regex,
-    //   // mas não abordaremos aqui
-
     is_admin: z.boolean(),
 
     login_attempts: z
@@ -48,25 +42,34 @@ export default z
       // coerce força a conversão para o tipo date, se o valor recebido
       // for string
       z.coerce.date().optional(), // o campo é opcional
-  })
-  .refine(
-    (user) => {
-      // Se a senha e a confirmação da senha não forem vazias,
-      // ambas devem ter o mesmo valor
-      user.password && user.password2 && user.password !== user.password2;
-    },
-    {
-      message: "A confirmação da senha não confere com a senha",
-      // A mensagem de erro estará associada ao campo "password2"
-      path: ["password2"],
-    }
-  )
-  .refine(
-    (user) => {
-      user.changePassword && user.password.length < 8;
-    },
-    {
-      message: "A senha deve ter, pelo menos, 8 caracteres",
-      path: ["password"],
-    }
-  );
+  });
+
+  // Acrescenta regras adicionais caso a senha necessite ser validada
+  if (validatePassword) {
+    rules = rules
+      .extend({
+        password: z
+          .string({ message: "Informe a senha" })
+          .min(8, { message: "A senha deve ter, no mínimo, 8 caracteres" }),
+        // Obs.: é possível fazer validações mais complexas usando regex,
+        // mas não abordaremos aqui
+
+        password2: z.string({ message: "Informe a confirmação da senha" }),
+      })
+      .refine(
+        (user) => {
+          // Se a senha e a confirmação da senha não forem vazias,
+          // ambas devem ter o mesmo valor
+          if (user.password2) return user.password === user.password2;
+          else return true;
+        },
+        {
+          message: "A confirmação da senha não confere com a senha",
+          // A mensagem de erro estará associada ao campo "password2"
+          path: ["password2"],
+        }
+      );
+  }
+
+  return rules;
+}
