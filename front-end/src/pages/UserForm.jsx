@@ -5,6 +5,10 @@ import './UserForm.css'
 import getUserModel from '../models/User'
 import { ZodError } from 'zod'
 
+/*
+  OWASP API2:2023 - Autenticação Quebrada
+  Essa página é usada para criar ou editar um usuário usando o useNavigate para navegar para outras páginas e o useParams para obter os parâmetros da rota.
+*/
 export default function UserForm() {
   const navigate = useNavigate()
   const params = useParams()
@@ -24,7 +28,10 @@ export default function UserForm() {
   } = state
 
   const editPasswordRef = React.useRef()
-
+  /*
+    OWASP API2:2023 - Autenticação Quebrada
+    Se a rota tiver um id, a função fetchData é chamada para buscar os dados do usuário. Caso contrário, os campos de senha são mostrados por padrão.
+  */
   React.useEffect(() => {
 
     if(params.id) fetchData()

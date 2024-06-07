@@ -15,6 +15,7 @@ controller.create = async function(req, res) {
     const User = getUserModel(true)
     User.parse(req.body)
 
+    // OWASP API2:2023-Broken Authentication: O bcrypt faz o hash de senhas para ajudar contra ataques de força bruta.
     // Criptografando a senha
     req.body.password = await bcrypt.hash(req.body.password, 12)
 

@@ -12,6 +12,7 @@ router.put('/:id', controller.update)
 router.delete('/:id', controller.delete)
 router.post('/logout', controller.logout)
 
+//OWASP API4:2023 -  Consumo irrestrito de recursos
 // Número de logins será limitado pelo rateLimiter
 router.post('/login', rateLimiter, controller.login)
 

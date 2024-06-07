@@ -52,11 +52,17 @@ export default function(req, res, next) {
   jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
 
     /* 
+      OWASP API2:2023 - Autenticação Quebrada
       Se há erro, significa que o token é inválido ou está expirado
       HTTP 403: Forbidden
     */
     if(error) return res.status(403).end()
 
+
+    /*
+    OWASP API2:2023 - Autenticação Quebrada
+    Se o token está OK, guarda as informações do usuário autenticado no objeto 'req' para futura utilização.
+  */
     /*
       Se chegamos até aqui, o token está OK e temos as informações
       do usuário autenticado no parâmetro 'user'. Vamos guardá-lo

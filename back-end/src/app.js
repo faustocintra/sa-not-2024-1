@@ -17,6 +17,10 @@ const app = express();
 import helmet from 'helmet'
 app.use(helmet())
 
+/*
+  OWASP API3:2023 - Falha de autenticação a nível de propriedade.
+  O cors oferece um middleware para ser usado para Cross-Origin Resource Sharing (Compartilhamento de Recursos de Origem Cruzada)
+*/
 import cors from 'cors'
 app.use(cors({
   origin: process.env.FRONT_END_SERVER.split(','),
@@ -31,6 +35,10 @@ app.use(cookieParser());
 app.use("/", indexRouter);
 //app.use("/users", usersRouter);
 
+/*
+  OWASP API2:2023 - Autenticação Quebrada
+  O middleware de autenticação é usado para verificar se o usuário está autenticado antes de permitir que ele acesse certas rotas.
+*/
 // MIDDLEWARE DE AUTENTICAÇÃO
 import auth from './middleware/auth.js'
 app.use(auth)

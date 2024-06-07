@@ -7,6 +7,10 @@
  * @license GL2PS
  */
 
+/*
+  OWASP API8:2023 - Logging e Monitoramento Insuficientes
+  A classe HttpError é usada para representar erros HTTP. Isso pode ser útil para registrar e monitorar erros.
+*/
 class HttpError extends Error {
   constructor(status, message) {
     super(message)
@@ -20,6 +24,10 @@ const myfetch = {}  // Objeto vazio
 // Lê o endereço do back-end a partir do arquivo .env.local
 const baseUrl = import.meta.env.VITE_API_BASE
 
+/*
+  OWASP API2:2023 - Autenticação Quebrada
+  Aqui a função configura opções de solicitações de fetch, incluindo o token de autenticação no cabeçalho de autenticação
+*/
 function getOptions(body = null, method = 'GET') {
   const options = {
     method,
