@@ -1,7 +1,6 @@
 import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import myfetch from '../lib/myfetch'
-import './UserForm.css'
 import getUserModel from '../models/User'
 import { ZodError } from 'zod'
 

@@ -33,13 +33,13 @@ export default function AppHeader() {
       try {
         await myfetch.post('/users/logout')
         navigate('/login')
-    }
-    catch(error) {
-      console.error(error)
-      alert('ERRO DO SERVIDOR: ' + error.message)
+      }
+      catch(error) {
+        console.error(error)
+        alert('ERRO DO SERVIDOR: ' + error.message)
+      }
     }
   }
-}
 
   function AuthControl() {
     if(authUser) return (
@@ -62,7 +62,7 @@ export default function AppHeader() {
       <ol style={{ listStyleType: 'none', display: 'flex' }}>
         <MenuItem dest="/">Página inicial</MenuItem>
         <MenuItem userLevel={2} dest="/users">Usuários</MenuItem>
-        <MenuItem userLevel={1} dest="/brute-force">força bruta</MenuItem>
+        <MenuItem userLevel={1} dest="/brute-force">Força bruta</MenuItem>
         <AuthControl key="#" />
       </ol>
     </>
