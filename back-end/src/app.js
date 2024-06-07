@@ -14,8 +14,20 @@ const app = express();
 // Helmet é um pacote que provê várias medidas de segurança,
 // como esconder a tecnologia empregada pelo back-end
 // (cabeçalho X-Powered-By)
+/* 
+  API 8 - Má configuração de segurança 
+  O Helmet protege os cabeçalhos HTTP retornados pelo sistema, seu uso vai impedir vulnerabilidades de configuração.
+
+  O Helmet ocultará por exemplo, as tecnologias que foram utilizadas nesse projeto.
+*/
 import helmet from 'helmet'
 app.use(helmet())
+
+/*
+  API7:2023 – Falsificação de requisição do lado do servidor.
+  Através de cookies, o Cors vai permitir que apenas o front-end deste projeto consiga enviar requisições ao back-end.
+
+*/
 
 import cors from 'cors'
 app.use(cors({
@@ -31,6 +43,16 @@ app.use(cookieParser());
 app.use("/", indexRouter);
 //app.use("/users", usersRouter);
 
+
+/*
+  API2:2023 – Falha de autenticação
+
+  O auth atua no controle de autoridade dos usuários
+
+  Exemplo de uso: no arquivo user.js presente na pasta controllers do back-end, o auth está sendo
+  utilizado para garantir que apenas usuarios administradores tenham acesso aos usuários cadastrados
+  no sistema.
+*/
 // MIDDLEWARE DE AUTENTICAÇÃO
 import auth from './middleware/auth.js'
 app.use(auth)

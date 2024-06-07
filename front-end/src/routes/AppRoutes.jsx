@@ -9,6 +9,14 @@ import UserList from '../pages/UserList'
 import UserForm from '../pages/UserForm'
 import BruteForce from '../pages/BruteForce'
 
+/*
+  API5:2023 – Falha de autenticação a nível de função & API1:2023 – Falha de autenticação a nível de objeto.
+
+  O uso do AuthGuard garante que apenas usuários administradores 
+  tenham acesso a lista de usuarios cadastrados no sistema.
+
+*/
+
 // Rotas protegidas por AuthGuard
 const guardedUserList = (
   <AuthGuard userLevel={2}>

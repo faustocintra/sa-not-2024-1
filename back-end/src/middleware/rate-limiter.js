@@ -1,3 +1,9 @@
+/*
+   API4:2023 – Consumo irrestrito de recursos
+   
+   o rateLimit limita a quantidade de requisições por IP, evitando ataques DoS com objetivo de sobrecarregar ou derrubar o sistema.
+*/
+
 import { rateLimit } from 'express-rate-limit'
 
 const rateLimiter = rateLimit({
