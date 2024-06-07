@@ -3,7 +3,6 @@ import controller from '../controllers/user.js'
 import rateLimiter from '../middleware/rate-limiter.js'
 
 const router = Router()
-console.log("aaa")
 
 router.get('/me', controller.me)
 router.post('/', controller.create)
