@@ -34,13 +34,16 @@ controller.create = async function(req, res) {
   }
 }
 
+
 controller.retrieveAll = async function(req, res) {
   try {
 
-    // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
-    // Somente usuários do nível administrador podem ter acesso à listagem de todos
-    // os usuários
-    // Caso contrário, retorna HTTP 403: Forbidden
+    /*
+    Vulnerabilidade: API1:2023 - Falha de Autenticação a nível de objeto
+    Esta vulnerabilidade foi evitada na linha de código abaixo, onde é verificado se o usuário logado é administrador.
+    Caso ele for administrador, é permitido ele listar todos usuários da aplicação.
+    Essa verificação é importante para não comprometer dados para usuários que não deveriam visualizar tais dados.
+    */
     if(! req?.authUser?.is_admin) return res.status(403).end()
 
     const result = await prisma.user.findMany()
@@ -86,8 +89,6 @@ controller.retrieveOne = async function(req, res) {
 controller.update = async function(req, res) {
   try {
 
-    // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
-    // Usuário que não seja administrador somente pode alterar o próprio cadastro
     if((! req?.authUser?.is_admin) && Number(req?.authUser?.id) !== Number(req.params.id)) {
       // HTTP 403: Forbidden
       res.status(403).end()
@@ -124,6 +125,18 @@ controller.update = async function(req, res) {
   }
 }
 
+/* 
+Vulnerabilidade: API5:2023 - Falha de Autenticação a nível de função
+Nesse endpoint abaixo deveria ter uma verificação para que caso o usuário logado não for administrador
+consiga somente excluir a própria conta, pois do jeito que está abaixo, o usuário poderia conseguir deletar
+a conta de algum outro usuário da aplicação. Deveria ser implementado algo semelhante ao endpoint de update
+if((! req?.authUser?.is_admin) && Number(req?.authUser?.id) !== Number(req.params.id)) { 
+   res.status(403).end()
+} 
+Esse código acima basicamente verifica se o usuário logado não é administrador e se o id que ele está tentando deletar
+seja diferente do seu próprio, caso isso se confirme, o endpoint já para nessa parte, sem ser executado, retornando um
+status 403, de forbidden.
+*/
 controller.delete = async function(req, res) {
   try {
     await prisma.user.delete({

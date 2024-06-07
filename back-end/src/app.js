@@ -1,4 +1,11 @@
 // Importa as variáveis de ambiente do arquivo .env
+/*
+Vulnerabilidade: API8:2023 - Má configuração de segurança
+No código abaixo, com o uso do dotenv, ajuda a combater a vulnerabilidades com segurança do sistema
+Com o dotenv, é possível colocar informações sensíveis em variáveis de ambiente, onde fica armazenado em um
+arquivo .env do projeto, onde não é enviado para o versionamento do repositório, evitando assim a exposição
+de informações sensíveis a terceiros, por meio do repositório do código
+*/
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -17,6 +24,7 @@ const app = express();
 import helmet from 'helmet'
 app.use(helmet())
 
+// 
 import cors from 'cors'
 app.use(cors({
   origin: process.env.FRONT_END_SERVER.split(','),
