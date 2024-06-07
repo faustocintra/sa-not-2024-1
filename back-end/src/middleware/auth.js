@@ -28,6 +28,16 @@ export default function(req, res, next) {
   let token = null
 
   // 1. Procura o token em um cookie
+
+  /*
+    Vulnerabilidade: API2:2023 – Falha de autenticação
+    Esta vulnerabilidade deveria ser evitada no codigo o token esta sendo exposto dessa forma fica facil com alguma invasao pegar um token e tomar controle
+    da aplicação de forma temporaria ou permanente. Dessa forma a autenticação foi implementada incorretamente, retirando o codigo ja se torna uma forma
+    de se proteger deixando de expor um dado tao sigiloso
+
+    `console.log({ AUTH_COOKIE: token })`
+  */
+
   token = req.cookies[process.env.AUTH_COOKIE_NAME]
   console.log({ AUTH_COOKIE: token })
   
