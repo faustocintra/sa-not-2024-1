@@ -29,6 +29,7 @@ export default function(req, res, next) {
 // e fazendo o processo de verificação do token de maneira correta no código a seguir
 // impedindo que atacantes comprometam tokens de autenticação
 
+
   /* PROCESSO DE VERIFICAÇÃO DO TOKEN DE AUTENTICAÇÃO */
   let token = null
 

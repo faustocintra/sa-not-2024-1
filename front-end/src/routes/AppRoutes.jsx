@@ -10,6 +10,12 @@ import UserForm from '../pages/UserForm'
 import BruteForce from '../pages/BruteForce'
 
 // Rotas protegidas por AuthGuard
+
+// API3:2023 – Falha de autenticação a nível de propriedade
+// ao se utilizar a biblioteca AuthGuard o Serviço que decide se rotas podem ser ativadas ou não
+// utilizando o AuthService, assim fazendo validação adequada de   
+// autorização o nível das propriedades  
+
 const guardedUserList = (
   <AuthGuard userLevel={2}>
     <UserList />

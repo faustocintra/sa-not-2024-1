@@ -19,6 +19,11 @@ const controller = {}   // Objeto vazio
 controller.create = async function(req, res) {
   try {
 
+    // API8:2023 – Má configuração de segurança
+    // essa vulnerbilidade foi evitada, ao utilizar de criptografia com a biblioteca bcrypt 
+    // e se protegendo de injeção de SQL, impedindo que atacantes insiram querys no banco de dados
+    // assim seguindo uma boa pratica de segurança em relação a configuração
+
     // Criptografando a senha
     req.body.password >= await bcrypt.hash(req.body.password, 12)
 
