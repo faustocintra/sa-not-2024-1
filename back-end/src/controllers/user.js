@@ -1,3 +1,64 @@
+/*
+1. Falha de autenticação a nível de objeto (API1:2023)
+Detalhe:
+No método retrieveAll e update, há verificações para garantir que apenas usuários administradores possam acessar ou modificar determinados recursos.
+
+Explicação:
+Essa verificação é essencial para garantir que usuários não autorizados não possam acessar ou modificar dados de 
+outros usuários. Sem essas verificações, qualquer usuário autenticado poderia potencialmente acessar dados confidenciais de outros usuários.
+
+***Esta linha de código evita que usuários não-administradores acessem a lista de todos os usuários, 
+prevenindo a vulnerabilidade de Broken Object Level Authorization.
+
+Esta vulnerabilidade foi evitado no código ao fazer:
+***Código***
+if(! req?.authUser?.is_admin) return res.status(403).end();
+
+*/
+
+/*
+2. Má configuração de segurança (API8:2023)
+Detalhe:
+Ao definir cookies no método login, o código configura httpOnly, secure, e sameSite atributos para os cookies.
+
+Explicação:
+Essas configurações ajudam a proteger o cookie de manipulação via scripts no cliente, enviam o cookie apenas sobre conexões 
+seguras e restringem o envio do cookie apenas para o mesmo site, respectivamente.
+
+***Estas configurações ajudam a mitigar riscos de segurança de configuração inadequada (Má configuração de segurança).
+
+Esta vulnerabilidade foi evitado no código ao fazer:
+***Código***
+res.cookie(process.env.AUTH_COOKIE_NAME, token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'Strict',
+  path: '/',
+  maxAge: 24 * 60 * 60 * 1000
+});
+
+*/
+
+/*
+3. Falha de autenticação (API2:2023)
+Detalhe:
+No método login, há verificações para controlar tentativas de login e atrasos para novas tentativas após falhas.
+
+Explicação:
+O controle de tentativas de login e a implementação de atrasos progressivos ajudam a mitigar ataques de força bruta.
+
+***Esse código mostram como impedir repetidas tentativas de login sem sucesso, prevenindo ataques de força bruta.
+
+Esta vulnerabilidade foi evitado no código ao fazer:
+***Código***
+if(user.login_attempts >= Number(process.env.MAX_LOGIN_ATTEMPTS) &&
+  new Date() < canLoginAfter) {
+  res.setHeader('Retry-After', currentDelayMinutes * 60 * 1000);
+  return res.status(429).end();
+}
+
+*/
+
 import prisma from '../database/client.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
