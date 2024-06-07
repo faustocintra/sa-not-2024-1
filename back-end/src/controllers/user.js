@@ -42,6 +42,12 @@ controller.retrieveAll = async function(req, res) {
     // os usuários
     // Caso contrário, retorna HTTP 403: Forbidden
     if(! req?.authUser?.is_admin) return res.status(403).end()
+    /* 
+        Vulnerabilidade: API1:2023 - Autorização de Nível de Objeto Quebrado
+        No código acima, evita a primeira das vulnerabilidades, pois ele
+        valida se o usuário é administrador, caso for ele ira exibir
+        a lista dos usuários
+    */
 
     const result = await prisma.user.findMany()
     // Retorna o resultado com HTTP 200: OK (implícito)
@@ -50,6 +56,13 @@ controller.retrieveAll = async function(req, res) {
     for(let user of result) {
       if(user.password) delete user.password
     }
+
+    /* 
+        Vulnerabilidade: API3:2023 - Autorização de nível de propriedade de objeto quebrado
+        A partir do trecho do código acima, mesmo depois da validação do nível do usuário,
+        é retirado do retorno informações confidenciais que não deveriam acessados por
+        nenhum outro usuário.
+    */
 
     res.send(result)
   }
@@ -70,6 +83,12 @@ controller.retrieveOne = async function(req, res) {
 
     // Exclui o campo "password" do resultado
     if(result?.password) delete result.password
+    /* 
+        Vulnerabilidade: API3:2023 - Autorização de nível de propriedade de objeto quebrado
+        A partir do trecho do código acima, mesmo depois da validação do nível do usuário,
+        é retirado do retorno informações confidenciais que não deveriam acessados por
+        nenhum outro usuário.
+    */
 
     // Resultado encontrado ~> HTTP 200: OK (implícito)
     if(result) res.send(result)
@@ -92,6 +111,14 @@ controller.update = async function(req, res) {
       // HTTP 403: Forbidden
       res.status(403).end()
     }
+    /* 
+        Vulnerabilidade: API1:2023 - Autorização de Nível de Objeto Quebrado
+        No código acima, evita a primeira das vulnerabilidades, pois ele
+        valida se o usuário é administrador e se o id que está tentando 
+        atualizar é igual ao seu, pois somente os administradores podem 
+        atualizar qualquer usuário.
+    */
+
 
     // O model para a validação do usuário será criado com validação de senha
     // se o campo 'password' tiver sido passado no req.body
@@ -206,6 +233,12 @@ controller.login = async function(req, res) {
       where: { username: req.body.username.toLowerCase() }
     })
 
+    /* 
+      Vulnerabilidade: API10:2023   –   Consumo   inseguro   de   APIs.
+      Esta vulnerabilidade foi evitada no código acima ao ser utilizado um ORM,
+      que nos ajuda a evitar entradas inapropriadas do usuário como SQL Injection
+    */
+
     // Se o usuário não for encontrado ~>
     // HTTP 401: Unauthorized
     if(! user) return res.status(401).end()
@@ -231,6 +264,13 @@ controller.login = async function(req, res) {
       // HTTP 429: Too Many Attempts
       return res.status(429).end()
     }
+
+    /* 
+        Vulnerabilidade: API2:2023 - Autenticação quebrada
+        A partir dos trechos de código acima, é realizado a validação do 
+        número de tentativas de login, que ao execeder o limite, é adicionado
+        uma certa quantitade de tempo, evitando o ataque de força bruta.
+    */
 
     // Usuário encontrado, vamos conferir a senha
     const passwordMatches = await bcrypt.compare(req.body.password, user.password)

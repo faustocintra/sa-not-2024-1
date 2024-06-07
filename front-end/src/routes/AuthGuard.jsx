@@ -5,6 +5,14 @@ export default function AuthGuard ({userLevel, children}){
 
     const {authUser}= React.useContext(AuthUserContext)
 
+
+    /* 
+        Vulnerabilidade: API5:2023 - Autorização de Nível de Função Quebrada
+        No código abaixo, a partir do nível do usuário e pela validação do 
+        authUser para verificar se o mesmo é admnistrador, é evitado tal 
+        vulnerabilidade, evitando exibir a lista de usuários ou rotas
+        confidenciais à pessoas não autorizadas.
+    */
     if((userLevel ===0) ||
         (userLevel ===1 && authUser) ||
         (userLevel ===2 && authUser?.is_admin)

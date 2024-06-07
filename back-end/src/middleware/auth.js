@@ -38,6 +38,12 @@ export default function(req, res, next) {
   
   // VERIFICAÇÃO E VALIDAÇÃO DO TOKEN
   jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
+    /* 
+        Vulnerabilidade: API2:2023 - Autenticação quebrada
+        A partir do trecho do código acima, é realizado a validação do 
+        token de autenticação que verifica se o mesmo é válido.
+    */
+
 
     /* 
       Se há erro, significa que o token é inválido ou está expirado
