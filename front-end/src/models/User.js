@@ -65,3 +65,14 @@ export default function getUserModel(validatePassword = true) {
   return rules
 
 }
+
+/**
+ * API6:2023 – Acesso irrestrito a fluxos de negócio sensíveis.
+ * Utilização de zod para garantir que apenas os campos permitidos sejam aceitos e validados.
+ * import { z } from 'zod'
+ * 
+ * API2:2023 - Broken Authentication:
+ * Senhas são validadas para garantir complexidade mínima (mínimo de 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais).
+ * Incremento do número de tentativas de login e aplicação de níveis de retardo para proteger contra ataques de força bruta.
+
+ */

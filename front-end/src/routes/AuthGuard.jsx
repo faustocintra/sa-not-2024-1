@@ -10,7 +10,7 @@ export default function AuthGuard ({userLevel, children}) {
     */
    const {authUser} = React.useContext(AuthUserContext)
 
-   if((userLevel === 0) || (userLevel === 1 && authUser) || (userLevel === 2 && authUser? is.admin))
+   if((userLevel === 0) || (userLevel === 1 && authUser) || (userLevel === 2 && authUser?.is.admin))
     return children
 
    else return(
@@ -20,3 +20,13 @@ export default function AuthGuard ({userLevel, children}) {
     </>
    )
 }
+
+/**
+ * API5:2023 – Falha de autenticação a nível de função
+ * essa vulnmerabilidade foi solucionada fazendo verificação baseada no userLevel para assegurar que apenas usuários autorizados 
+ * tenham acesso.
+ * export default function AuthGuard ({userLevel, children}) {
+ * const {authUser} = React.useContext(AuthUserContext)
+ * if((userLevel === 0) || (userLevel === 1 && authUser) || (userLevel === 2 && authUser?.is.admin))
+    return children
+ */

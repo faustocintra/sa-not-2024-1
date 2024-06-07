@@ -36,3 +36,9 @@ export default function AppRoutes() {
     <Route path="/brute-force" element={ guardedBruteForce } /> 
   </Routes>
 }
+
+/**
+ * Autenticação e Autorização (API1, API2, API5): Essas vulnerabilidade foram solucionadas com o uso do AuthGuard para 
+ * proteger rotas com base no nível de usuário. 
+ * O userLevel indica o nível de acesso necessário para acessar a rota.
+ */

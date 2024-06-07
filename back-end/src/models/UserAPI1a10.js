@@ -1,0 +1,52 @@
+import { z } from 'zod'
+
+export default function getUserModel(validatePassword = true) {
+  
+  let rules = z.object({
+    
+    fullname:
+      z.string()
+      .trim()
+      .min(5, { message: 'O nome deve ter, no mínimo, 5 caracteres' })
+      .max(50, { message: 'O nome deve ter, no máximo, 50 caracteres' })
+      .includes(' ', { message: 'O nome deve ter um espaço em branco separando nome e sobrenome' }),
+
+    username:
+      z.string()
+      .trim()
+      .transform(val => val.toLowerCase())
+      .refine(val => val.match(/^[a-z0-9_]{1,20}$/), { message: 'O nome do usuário pode conter apenas letras de a a z, dígitos e sublinhado' })
+      .refine(val => val.length <= 20, { message: 'O nome do usuário deve ter, no máximo, 20 caracteres' }),
+
+    is_admin:
+      z.boolean(),
+
+    login_attempts:
+      z.number().nonnegative()
+      .lte(3, { message: 'O número de tentativas deve ser menor ou igual a 3' })
+      .optional(),
+
+    delay_level:
+      z.number().nonnegative()
+      .lte(6, { message: 'O nível de retardo deve ser menor ou igual a 6' })
+      .optional(),
+
+    last_attempt:
+      z.coerce.date().optional()
+  })
+
+  if(validatePassword) {
+    rules = rules.extend({
+      password:
+        z.string({ message: 'Informe a senha' })
+        .min(8, { message: 'A senha deve ter, no mínimo, 8 caracteres' })
+        .refine(val => /[a-z]/.test(val), { message: 'A senha deve conter pelo menos uma letra minúscula' })
+        .refine(val => /[A-Z]/.test(val), { message: 'A senha deve conter pelo menos uma letra maiúscula' })
+        .refine(val => /[0-9]/.test(val), { message: 'A senha deve conter pelo menos um dígito' })
+        .refine(val => /[@$!%*?&#]/.test(val), { message: 'A senha deve conter pelo menos um caractere especial' })
+    })
+  }
+
+  return rules
+}
+

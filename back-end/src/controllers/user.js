@@ -334,3 +334,21 @@ controller.me = function(req, res) {
 }
 
 export default controller
+
+/**
+ * 1.	API1:2023 - Broken Object Level Authorization:  * Implementamos a verificação de permissões na função retrieveAll, garantindo que apenas administradores possam acessar a listagem completa de usuários.
+ * O modelo de usuário não afeta diretamente esta proteção, mas as funções de controller devem incluir verificações de autorização.
+ * controller.retrieveAll = async function(req, res)
+
+ * API3:2023 – Falha de autenticação a nível de propriedade. 
+ * Garantimos que o campo password seja excluído das respostas, conforme visto na função retrieveAll.
+ * // Exclui o campo "password" do resultado
+ *   for(let user of result) {
+ *     if(user.password) delete user.password
+ *   }
+ * 
+ * 
+ * 
+ */
+
+  

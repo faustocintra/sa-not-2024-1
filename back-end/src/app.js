@@ -49,3 +49,10 @@ import userRouter from './routes/user.js'
 app.use('/users', userRouter)
 
 export default app;
+
+/**
+ * API7:2023– Falsificação   de   requisição   do   lado   do   servidor.
+ * Essa vulnerabilidade pode ser resolvida fazendo o uso do helmet
+ * // Configuações de segurança
+ * app.use(helmet()); 
+ */

@@ -50,3 +50,17 @@ export default function UserList() {
     </>
   )
 }
+
+/**
+ * API8:2023 – Má configuração de segurança
+ * Essa vulnerabilidade pode ser resolvida usando a função sanitize para limpar qualquer entrada de dados para prevenir injeções de código.
+ * try {
+      const result = await myfetch.get('/users')
+      // Filtrar e sanitizar os dados recebidos do backend
+      const sanitizedUsers = result.map(user => ({
+        id: user.id,
+        fullname: sanitize(user.fullname),
+        username: sanitize(user.username),
+        is_admin: user.is_admin
+      }))
+ */

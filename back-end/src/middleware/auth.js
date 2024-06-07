@@ -70,3 +70,9 @@ export default function(req, res, next) {
   })
 
 }
+
+/**
+ * API1:2023 - Broken Object Level Authorization, API2:2023 – Falha de autenticação, API5:2023 – Falha de autenticação a nível de função
+ * Essa vulnerabilidade foi evitada no codigo fazendo os seguintes passos verificação do TOKEN, cabeçalho de autorização, verificação e validação do tokem
+ * 
+ */
