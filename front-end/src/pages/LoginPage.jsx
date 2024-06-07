@@ -2,7 +2,8 @@ import React from 'react'
 import myfetch from '../lib/myfetch'
 import { useNavigate } from 'react-router-dom'
 import { ZodError } from 'zod'
-import Login from '../models/Login' 
+import Login from '../models/Login'
+
 
 export default function LoginPage() {
   const [username, setUsername] = React.useState('')
@@ -14,10 +15,14 @@ export default function LoginPage() {
   async function handleSubmit(event) {
     event.preventDefault()    // Evita o recarregamento da tela
     try {
+
+      // Invoca a validação do model Login
+      Login.parse({ username, password })
+
       // Em aplicações de produção, aqui deveria ser mostrado
       // algum feedback de espera para o usuário
-      // const result = await myfetch.post('/users/login', { username, password })
-      await myfetch.post('/users/login', {username, password})
+      //const result = await myfetch.post('/users/login', { username, password })
+      await myfetch.post('/users/login', { username, password })
 
       // Armazena o token recebido no localStorage
       // ATENÇÃO: ABORDAGEM NÃO SEGURA, há outros meios
@@ -33,15 +38,14 @@ export default function LoginPage() {
       console.error(error)
 
       if(error instanceof ZodError) {
-        // Formamos um objeto contendo os erros do Zod e os colocamos na variável de estado
-        // inputErrors
+        // Formamos um objeto contendo os erros do Zod e os colocamos
+        // na variável de estado inputErrors
         const messages = {}
-        for (let i of error.issues) [i.path[0]] = i.message
+        for(let i of error.issues) messages[i.path[0]] = i.message
         setInputErrors(messages)
         alert('Há campos com valores inválidos no formulário. Verifique.')
       }
-
-      if(error.status === 400) alert(error.message)
+      else if(error.status === 400) alert(error.message)
       else alert('Usuário ou senha inválidos.')
     }
   }

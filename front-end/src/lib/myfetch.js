@@ -40,8 +40,8 @@ function getOptions(body = null, method = 'GET') {
 
 function getErrorDescription(response) {
   switch(response.status) {
-    case 400:   // Bad Request, provavelmente produzido pelo Zod
-      return  'ERRO: falha na validação de dados no servidor'
+    case 400:   // Bad Request, provavelmente produzido pelo zod
+      return `ERRO: falha na validação de dados no servidor`
 
     case 401:   // Unauthorized
       return 'ERRO: usuário ou senha incorretos'
@@ -49,7 +49,7 @@ function getErrorDescription(response) {
     case 403:   // Forbidden
       return 'ERRO: acesso não autorizado'
 
-    case 500:   // Internal server error
+    case 500:   // Internal Server Error
       return 'ERRO: mau funcionamento do servidor remoto'
 
     default:

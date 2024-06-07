@@ -65,3 +65,4 @@ export default function getUserModel(validatePassword = true) {
   return rules
 
 }
+

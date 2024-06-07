@@ -6,14 +6,16 @@ import AppRoutes from './routes/AppRoutes'
 import AuthUserContext from './contexts/AuthUserContext'
 
 function App() {
+  const [authUser, setAuthUser] = React.useState(null)
+
   return (
     <>
       <BrowserRouter>
-        <AuthUserContext>
+        <AuthUserContext.Provider value={{authUser, setAuthUser}}>
           <AppHeader />
           <hr />
           <AppRoutes />
-        </AuthUserContext>
+        </AuthUserContext.Provider>
       </BrowserRouter>
     </>
   )
