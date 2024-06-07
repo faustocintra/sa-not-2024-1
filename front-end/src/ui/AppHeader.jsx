@@ -1,4 +1,5 @@
 import React from 'react'
+<<<<<<< HEAD
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import AuthUserContext from '../contexts/AuthUserContext'
 import myfetch from '../lib/myfetch'
@@ -55,15 +56,32 @@ export default function AppHeader() {
     )
   }
 
+=======
+import { Link } from 'react-router-dom'
+
+export default function AppHeader() {
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
   return (
     <>
       <h1>Segurança no Desenvolvimento de Aplicações</h1>
       <hr />
       <ol style={{ listStyleType: 'none', display: 'flex' }}>
+<<<<<<< HEAD
         <MenuItem dest={"/"} children={"Página Inicial"}/>
         <MenuItem dest={"/users"} userLevel={2} children={"Usuários"}/>
         <MenuItem dest={"/brute-force"} userLevel={1} children={"Força Bruta"}/>
         <AuthControl />
+=======
+        <li style={{ marginRight: '12px' }}>
+          <Link to="/">Página inicial</Link>
+        </li>
+        <li style={{ marginRight: '12px' }}>
+          <Link to="/login">Entrar</Link>
+        </li>
+        <li style={{ marginRight: '12px' }}>
+          <Link to="/users">Usuários</Link>
+        </li>
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
       </ol>
     </>
   )

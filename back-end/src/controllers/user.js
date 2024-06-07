@@ -1,20 +1,41 @@
 import prisma from '../database/client.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+<<<<<<< HEAD
 import { format, addMinutes } from 'date-fns'
 import { ZodError } from 'zod'
 import Login from '../models/Login.js'
 import getUserModel from '../models/User.js'
+=======
+import sqlite3 from 'sqlite3'
+import path from 'path'
+import {fileURLToPath} from 'url'
+import { error, log } from 'console'
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const basePath = __dirname.replaceAll('\\','/').replace('/src/controllers','')
+const dbPath = basePath + '/prisma/database/local.db';
+//console.log({dbPath});
+
+const db = new sqlite3.Database(dbPath, error => {
+  if(error) console.error("Não foi possivel conectar ao banco " + dbPath);
+  else console.log("Conectado com sucesso no banco " + dbPath);
+})
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
 
 const controller = {}   // Objeto vazio
 
 controller.create = async function(req, res) {
   try {
 
+<<<<<<< HEAD
     // O model de validação para o usuário é criado com a validação da senha ativada
     const User = getUserModel(true)
     User.parse(req.body)
 
+=======
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
     // Criptografando a senha
     req.body.password = await bcrypt.hash(req.body.password, 12)
 
@@ -25,17 +46,23 @@ controller.create = async function(req, res) {
   }
   catch(error) {
     console.error(error)
+<<<<<<< HEAD
 
     // HTTP 400: Bad Request
     if(error instanceof ZodError) res.status(400).send(error.issues)
 
     // HTTP 500: Internal Server Error
     else res.status(500).end()
+=======
+    // HTTP 500: Internal Server Error
+    res.status(500).end()
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
   }
 }
 
 controller.retrieveAll = async function(req, res) {
   try {
+<<<<<<< HEAD
 
     // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
     // Somente usuários do nível administrador podem ter acesso à listagem de todos
@@ -49,6 +76,8 @@ controller.retrieveAll = async function(req, res) {
         a lista dos usuários
     */
 
+=======
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
     const result = await prisma.user.findMany()
     // Retorna o resultado com HTTP 200: OK (implícito)
 
@@ -57,6 +86,7 @@ controller.retrieveAll = async function(req, res) {
       if(user.password) delete user.password
     }
 
+<<<<<<< HEAD
     /* 
         Vulnerabilidade: API3:2023 - Autorização de nível de propriedade de objeto quebrado
         A partir do trecho do código acima, mesmo depois da validação do nível do usuário,
@@ -64,6 +94,8 @@ controller.retrieveAll = async function(req, res) {
         nenhum outro usuário.
     */
 
+=======
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
     res.send(result)
   }
   catch(error) {
@@ -83,12 +115,15 @@ controller.retrieveOne = async function(req, res) {
 
     // Exclui o campo "password" do resultado
     if(result?.password) delete result.password
+<<<<<<< HEAD
     /* 
         Vulnerabilidade: API3:2023 - Autorização de nível de propriedade de objeto quebrado
         A partir do trecho do código acima, mesmo depois da validação do nível do usuário,
         é retirado do retorno informações confidenciais que não deveriam acessados por
         nenhum outro usuário.
     */
+=======
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
 
     // Resultado encontrado ~> HTTP 200: OK (implícito)
     if(result) res.send(result)
@@ -105,6 +140,7 @@ controller.retrieveOne = async function(req, res) {
 controller.update = async function(req, res) {
   try {
 
+<<<<<<< HEAD
     // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
     // Usuário que não seja administrador somente pode alterar o próprio cadastro
     if((! req?.authUser?.is_admin) && Number(req?.authUser?.id) !== Number(req.params.id)) {
@@ -125,6 +161,8 @@ controller.update = async function(req, res) {
     const User = getUserModel('password' in req.body)
     User.parse(req.body)
 
+=======
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
     // Se tiver sido passado o campo 'password' no body
     // da requisição, precisamos criptografá-lo antes de
     // enviar ao banco de dados
@@ -142,12 +180,17 @@ controller.update = async function(req, res) {
   }
   catch(error) {
     console.error(error)
+<<<<<<< HEAD
 
     // HTTP 400: Bad Request
     if(error instanceof ZodError) res.status(400).send(error.issues)
     
     // HTTP 500: Internal Server Error
     else res.status(500).end()
+=======
+    // HTTP 500: Internal Server Error
+    res.status(500).end()
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
   }
 }
 
@@ -168,6 +211,7 @@ controller.delete = async function(req, res) {
   }
 }
 
+<<<<<<< HEAD
 /*
   Função que obtém ou determina os parâmetros necessários para validar
   o login do usuário em função do número de tentativas e do tempo de 
@@ -228,21 +272,53 @@ controller.login = async function(req, res) {
     // Invoca a validação dos campos definida no model Login
     Login.parse(req.body)
 
+=======
+controller.login = function(req, res) {
+
+  const query = `select  * from user where username = '${req.body.username}'`
+
+  console.log(query);
+
+  db.get(query, [], async (error, user) => {
+    console.log(user);
+    if(error) return res.status(401).end()
+    
+    const passwordMatches = await bcrypt.compare(req.body.password, user.password)
+    if(! passwordMatches) return res.status(401).end()
+    
+    if(user.password) delete user.password
+
+    const token = jwt.sign(
+      user,
+      process.env.TOKEN_SECRET,   // Senha de criptografia do token
+      { expiresIn: '24h' }  // Prazo de validade do token
+    )
+
+    res.send({token})
+
+  })
+
+  /*try {
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
     // Busca o usuário pelo username
     const user = await prisma.user.findUnique({
       where: { username: req.body.username.toLowerCase() }
     })
 
+<<<<<<< HEAD
     /* 
       Vulnerabilidade: API10:2023   –   Consumo   inseguro   de   APIs.
       Esta vulnerabilidade foi evitada no código acima ao ser utilizado um ORM,
       que nos ajuda a evitar entradas inapropriadas do usuário como SQL Injection
     */
 
+=======
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
     // Se o usuário não for encontrado ~>
     // HTTP 401: Unauthorized
     if(! user) return res.status(401).end()
 
+<<<<<<< HEAD
     // Busca os parâmetros que serão usados na validação de tentativas
     // e intervalo de login
     const {
@@ -314,6 +390,16 @@ controller.login = async function(req, res) {
       }
     })
 
+=======
+    // Usuário encontrado, vamos conferir a senha
+    const passwordMatches = await bcrypt.compare(req.body.password, user.password)
+
+    // Se a senha estiver incorreta ~>
+    // HTTP 401: Unauthorized
+    if(! passwordMatches) return res.status(401).end()
+
+    // Se chegamos até aqui, username + password estão OK
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
     // Vamos criar o token e retorná-lo como resposta
 
     // O token inclui as informações do usuário. Vamos excluir o campo
@@ -326,6 +412,7 @@ controller.login = async function(req, res) {
       { expiresIn: '24h' }  // Prazo de validade do token
     )
 
+<<<<<<< HEAD
     // Formamos o cookie para enviar ao front-end
     res.cookie(process.env.AUTH_COOKIE_NAME, token, {
       httpOnly: true,   // O cookie ficará inacessível para JS
@@ -341,10 +428,15 @@ controller.login = async function(req, res) {
     // O token não é mais enviado na resposta
     // A resposta agora é simplesmente HTTP 204: No Content
     res.status(204).end()
+=======
+    // Retorna o token com status HTTP 200: OK (implícito)
+    res.send({token})
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
 
   }
   catch(error) {
     console.error(error)
+<<<<<<< HEAD
     // HTTP 400: Bad Request
     if (error instanceof ZodError) res.status(400).send(error.issues)
     
@@ -371,6 +463,11 @@ controller.me = function(req, res) {
   // autenticado
   // HTTP 401: Unauthorized
   else res.status(401).end()
+=======
+    // HTTP 500: Internal Server Error
+    res.status(500).send(error)
+  }*/
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
 }
 
 export default controller

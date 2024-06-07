@@ -14,6 +14,7 @@ datasource db {
 }
 
 model User {
+<<<<<<< HEAD
   id              Int         @id @default(autoincrement())
   fullname        String      // Nome completo do usuário
   username        String      @unique   // Nome de usuário
@@ -22,4 +23,11 @@ model User {
   login_attempts  Int         @default(0)       // Quantidade de tentativas
   delay_level     Int         @default(0)       // Nível do "castigo" de espera 
   last_attempt    DateTime?  
+=======
+  id            Int         @id @default(autoincrement())
+  fullname      String      // Nome completo do usuário
+  username      String      @unique   // Nome de usuário
+  password      String      // Senha
+  is_admin      Boolean     @default(false)
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
 }

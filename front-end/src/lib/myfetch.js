@@ -40,10 +40,13 @@ function getOptions(body = null, method = 'GET') {
 
 function getErrorDescription(response) {
   switch(response.status) {
+<<<<<<< HEAD
 
     case 400:
       return `ERRO: falha na validação de dados no servidor, ${response.code}`
 
+=======
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
     case 401:   // Unauthorized
       return 'ERRO: usuário ou senha incorretos'
 
@@ -59,6 +62,7 @@ function getErrorDescription(response) {
   }
 }
 
+<<<<<<< HEAD
 function processResponse(response) {
   if(response.ok) {
     const isJson = response.headers.get('content-type')?.includes('application/json')
@@ -70,21 +74,42 @@ function processResponse(response) {
 myfetch.post = async function(path, body) {
   const response = await fetch(baseUrl + path, getOptions(body, 'POST'))
   return processResponse(response)
+=======
+myfetch.post = async function(path, body) {
+  const response = await fetch(baseUrl + path, getOptions(body, 'POST'))
+  if(response.ok) return response.json()
+  else throw new HttpError(response.status, getErrorDescription(response))
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
 }
 
 myfetch.put = async function(path, body) {
   const response = await fetch(baseUrl + path, getOptions(body, 'PUT'))
+<<<<<<< HEAD
   return processResponse(response)
+=======
+  if(response.ok) return response.json()
+  else throw new HttpError(response.status, getErrorDescription(response))
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
 }
 
 myfetch.get = async function(path) {
   const response = await fetch(baseUrl + path, getOptions())
+<<<<<<< HEAD
   return processResponse(response)
+=======
+  if(response.ok) return response.json()
+  else throw new HttpError(response.status, getErrorDescription(response))
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
 }
 
 myfetch.delete = async function(path) {
   const response = await fetch(baseUrl + path, getOptions(null, 'DELETE'))
+<<<<<<< HEAD
   return processResponse(response)
+=======
+  if(response.ok) return response.json()
+  else throw new HttpError(response.status, getErrorDescription(response))
+>>>>>>> 9e5ca65e68ec605b359bcab584ef850069369e9a
 }
 
 export default myfetch
