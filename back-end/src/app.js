@@ -18,8 +18,22 @@ app.use(helmet())
 import cors from 'cors'
 app.use(cors({
   origin: process.env.FRONT_END_SERVER.split(','),
-  credentials: true   // Aceita cookies na requisição
+  credentials: true 
 }))
+
+    /* 
+        👆👆
+        Vulnerabilidade: API8:2023 – Má configuração de segurança.
+        Parte desta vulnerabilidade foi evitada da linha 18 a linha 22.
+        Nessas linhas configuramos o nosso Cors para receber apenas requisições de endereço 
+        do nosso front-end.
+        Com isso se algum atacante usar outro endereço para acessar algum endpoint da API,
+        será bloqueado.
+        No .env do back-end, coloquei todas as urls que devem ser aceitas para acessar
+        a nossa API, separando cada url por virgula.
+        FRONT_END_SERVER="http://localhost:5173,http://127.0.0.1:5173"
+    */
+
 
 app.use(logger("dev"));
 app.use(json());

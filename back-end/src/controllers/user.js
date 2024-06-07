@@ -8,7 +8,7 @@ import getUserModel from '../models/User.js'
 
 const controller = {}   // Objeto vazio
 
-controller.create = async function(req, res) {
+controller.create = async function (req, res) {
   try {
 
     const User = getUserModel(true)
@@ -22,70 +22,70 @@ controller.create = async function(req, res) {
     // HTTP 201: Created
     res.status(201).end()
   }
-  catch(error) {
+  catch (error) {
     console.error(error)
 
-    if(error instanceof ZodError) res.status(400).send(error.issues)
+    if (error instanceof ZodError) res.status(400).send(error.issues)
     // HTTP 500: Internal Server Error
     else res.status(500).end()
   }
 }
 
-controller.retrieveAll = async function(req, res) {
+controller.retrieveAll = async function (req, res) {
   try {
 
     // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
     // Somente usuários do nível administrador podem ter acesso à listagem de todos
     // os usuários
     // Caso contrário, retorna HTTP 403: Forbidden
-    if(! req?.authUser?.is_admin) return res.status(403).end()
+    if (!req?.authUser?.is_admin) return res.status(403).end()
 
     const result = await prisma.user.findMany()
     // Retorna o resultado com HTTP 200: OK (implícito)
 
     // Exclui o campo "password" do resultado
-    for(let user of result) {
-      if(user.password) delete user.password
+    for (let user of result) {
+      if (user.password) delete user.password
     }
 
     res.send(result)
   }
-  catch(error) {
+  catch (error) {
     console.error(error)
     // HTTP 500: Internal Server Error
     res.status(500).end()
   }
 }
 
-controller.retrieveOne = async function(req, res) {
+controller.retrieveOne = async function (req, res) {
   try {
     const result = await prisma.user.findUnique({
       where: { id: Number(req.params.id) }
     })
 
-    console.log({result})
+    console.log({ result })
 
     // Exclui o campo "password" do resultado
-    if(result?.password) delete result.password
+    if (result?.password) delete result.password
 
     // Resultado encontrado ~> HTTP 200: OK (implícito)
-    if(result) res.send(result)
+    if (result) res.send(result)
     // Resultado não encontrado ~> HTTP 404: Not Found
     else res.status(404).end()
   }
-  catch(error) {
+  catch (error) {
     console.error(error)
     // HTTP 500: Internal Server Error
     res.status(500).end()
   }
 }
 
-controller.update = async function(req, res) {
+controller.update = async function (req, res) {
   try {
 
     // Prevenção contra OWASP Top 10 API1:2023 - Broken Object Level Authorization
     // Usuário que não seja administrador somente pode alterar o próprio cadastro
-    if((! req?.authUser?.is_admin) && Number(req?.authUser?.id) !== Number(req.params.id)) {
+    if ((!req?.authUser?.is_admin) && Number(req?.authUser?.id) !== Number(req.params.id)) {
       // HTTP 403: Forbidden
       res.status(403).end()
     }
@@ -96,7 +96,7 @@ controller.update = async function(req, res) {
     // Se tiver sido passado o campo 'password' no body
     // da requisição, precisamos criptografá-lo antes de
     // enviar ao banco de dados
-    if(req.body.password) req.body.password = await bcrypt.hash(req.body.password, 12)
+    if (req.body.password) req.body.password = await bcrypt.hash(req.body.password, 12)
 
     const result = await prisma.user.update({
       where: { id: Number(req.params.id) },
@@ -104,20 +104,20 @@ controller.update = async function(req, res) {
     })
 
     // Encontrou e atualizou ~> HTTP 204: No Content
-    if(result) res.status(204).end()
+    if (result) res.status(204).end()
     // Não encontrou (e não atualizou) ~> HTTP 404: Not Found
     else res.status(404).end()
   }
-  catch(error) {
+  catch (error) {
     console.error(error)
-    if(error instanceof ZodError) res.status(400).send(error.issues)
+    if (error instanceof ZodError) res.status(400).send(error.issues)
 
     // HTTP 500: Internal Server Error
     else res.status(500).end()
   }
 }
 
-controller.delete = async function(req, res) {
+controller.delete = async function (req, res) {
   try {
     await prisma.user.delete({
       where: { id: Number(req.params.id) }
@@ -127,7 +127,7 @@ controller.delete = async function(req, res) {
     res.status(204).end()
     // Não encontrou (e não excluiu) ~> vai para o catch
   }
-  catch(error) {
+  catch (error) {
     console.error(error)
     // HTTP 500: Internal Server Error
     res.status(500).send(error)
@@ -142,14 +142,14 @@ controller.delete = async function(req, res) {
 function getUserLoginParams(user) {
   // Recuperamos os níveis de atraso da variável de ambiente
   const delayLevels = process.env.DELAY_LEVELS.split(',')
-  
+
   // Determinamos o nível de atraso atual e o próximo nível 
   let currentDelayLevel, nextDelayLevel
-  if(user.delay_level < delayLevels.length - 1) {
+  if (user.delay_level < delayLevels.length - 1) {
     currentDelayLevel = user.delay_level
     nextDelayLevel = currentDelayLevel + 1
   }
-  else if(user.delay_level === delayLevels.length) {
+  else if (user.delay_level === delayLevels.length) {
     currentDelayLevel = user.delay_level
     nextDelayLevel = currentDelayLevel
   }
@@ -162,7 +162,7 @@ function getUserLoginParams(user) {
   // e do próximo nível
   const currentDelayMinutes = Number(delayLevels[currentDelayLevel])
   const nextDelayMinutes = Number(delayLevels[nextDelayLevel])
-  
+
   // Determinamos o momento do último login e a data/hora após as quais
   // o usuário poderá tentar fazer login novamente
   const lastLogin = user.last_attempt ? user.last_attempt : null
@@ -171,13 +171,13 @@ function getUserLoginParams(user) {
   // Determinamos o número de tentativas atuais e o próximo número de tentativas
   // Sendo atingido o máximo de tentativas, a contagem reinicia em 0
   const currentLoginAttempts = user.login_attempts
-  const nextLoginAttempts = 
+  const nextLoginAttempts =
     currentLoginAttempts < Number(process.env.MAX_LOGIN_ATTEMPTS) ?
-    currentLoginAttempts + 1 :
-    0
+      currentLoginAttempts + 1 :
+      0
 
   return {
-    currentDelayLevel, 
+    currentDelayLevel,
     nextDelayLevel,
     currentDelayMinutes,
     nextDelayMinutes,
@@ -188,7 +188,7 @@ function getUserLoginParams(user) {
   }
 }
 
-controller.login = async function(req, res) {
+controller.login = async function (req, res) {
   try {
     Login.parse(req.body)
 
@@ -199,7 +199,7 @@ controller.login = async function(req, res) {
 
     // Se o usuário não for encontrado ~>
     // HTTP 401: Unauthorized
-    if(! user) return res.status(401).end()
+    if (!user) return res.status(401).end()
 
     // Busca os parâmetros que serão usados na validação de tentativas
     // e intervalo de login
@@ -215,7 +215,7 @@ controller.login = async function(req, res) {
 
     // Usuário encontrado, precisamos verificar se ele ainda tem
     // tentativas de login disponíveis ou se o tempo de atraso já expirou
-    if(user.login_attempts >= Number(process.env.MAX_LOGIN_ATTEMPTS) &&
+    if (user.login_attempts >= Number(process.env.MAX_LOGIN_ATTEMPTS) &&
       new Date() < canLoginAfter) {
       // Avisa que o usuário poderá tentar de novo após XXX milissegundos
       res.setHeader('Retry-After', currentDelayMinutes * 60 * 1000)
@@ -253,6 +253,20 @@ controller.login = async function(req, res) {
       // HTTP 401: Unauthorized
       return res.status(401).end()
     }
+
+    /* 
+        👆👆
+        Vulnerabilidade: API2:2023 – Falha de autenticação.
+        Qualquer forma que forneça o token do usuário a um atacante entra nesta regra.
+        Esta vulnerabilidade foi evitada da linha 206 a linha 256.
+        Nessas linhas evitamos que o atacante tente acertar a
+        senha de algum usuário fazendo um ataque de força bruta. 
+        Toda vez que a senha digitada for incorreta, é acrescentado 1 ao número de tentativas,
+        e após uma certa quantidade de vezes, aquele usuário fica bloqueado de fazer tentativas
+        de login por um tempo.
+        Para atribuir este tempo, fizemos níveis de delay, quanto mais alto o nível, mais tempo
+        aquele usuário ficara bloqueado.
+    */
 
     // Se chegamos até aqui, username + password estão OK
     // Resetamos o número de tentativas e o nível de espera

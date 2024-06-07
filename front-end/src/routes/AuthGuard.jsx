@@ -18,3 +18,13 @@ export default function AuthGuard({ userLevel = 0, children }) {
 
     )
 }
+
+    /* 
+        👆👆
+        Vulnerabilidade: API5:2023 – Falha de autenticação a nível de função. P
+        Esta vulnerabilidade foi evitada nesta função AuthGuard
+        Nessas linhas evitamos que o atacante ou até mesmo outro usuário, tenha acesso a dados que 
+        não deveriam.
+        Verificando o nivel da cada usuário, conseguimos previnir que um usuário comum acesse 
+        a rotas que apenas usuários administradores deviam ter acesso
+    */
