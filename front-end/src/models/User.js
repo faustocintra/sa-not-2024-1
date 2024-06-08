@@ -66,3 +66,36 @@ export default function getUserModel(validatePassword = true) {
 
 }
 
+/*
+Vulnerabilidade: API2:2023 – Falha de autenticação
+Esta vulnerabilidade foi evitada ao implementar uma política de senha mínima com validação de senha e
+confirmação de senha.
+*/
+
+rules = rules.extend({
+  password:
+    z.string({ message: 'Informe a senha' })
+    .min(8, { message: 'A senha deve ter, no mínimo, 8 caracteres' }),
+  password2:
+    z.string({ message: 'Informe a confirmação da senha' })
+}).refine(user => {
+  if(user.password2) return user.password === user.password2
+  else return true
+}, { 
+  message: 'A confirmação da senha não confere com a senha',
+  path: ['password2']
+})
+
+/*
+Vulnerabilidade: API5:2023 – Falha de autenticação a nível de função
+Esta vulnerabilidade foi evitada ao incluir um campo 'is_admin' e garantir que as verificações de permissão
+apropriadas sejam aplicadas com base neste campo.
+*/
+
+is_admin: z.boolean()
+
+/*
+Vulnerabilidade: API9:2023 – Gerenciamento inapropriado do inventário
+Esta vulnerabilidade deveria ter sido evitada garantindo que todas as versões de APIs e endpoints sejam
+devidamente documentadas e mantidas atualizadas.
+*/

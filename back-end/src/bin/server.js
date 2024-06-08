@@ -25,6 +25,11 @@ const server = createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
+/*
+Vulnerabilidade: API8:2023 – Má configuração de segurança
+Esta vulnerabilidade foi evitada ao utilizar a variável de ambiente para definir a porta. 
+Isso evita a exposição de informações sensíveis diretamente no código.
+*/
 server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
@@ -53,6 +58,11 @@ function normalizePort(val) {
  * Event listener for HTTP server "error" event.
  */
 
+/*
+Vulnerabilidade: API4:2023 – Consumo irrestrito de recursos
+Esta vulnerabilidade deveria ter sido evitada no código implementando limites de taxa 
+(rate limiting) e restrições de uso para evitar que recursos sejam consumidos de forma excessiva.
+*/
 function onError(error) {
   if (error.syscall !== "listen") {
     throw error;
@@ -79,6 +89,11 @@ function onError(error) {
  * Event listener for HTTP server "listening" event.
  */
 
+/*
+Vulnerabilidade: API9:2023 – Gerenciamento inapropriado do inventário
+Esta vulnerabilidade poderia ser evitada ao manter um inventário atualizado dos endpoints da API e suas versões, 
+assim como documentar adequadamente a API para garantir que endpoints obsoletos não fiquem expostos.
+*/
 function onListening() {
   let addr = server.address();
   let bind = typeof addr === "string" ? `pipe  ${addr}` : `port ${addr.port}`;
